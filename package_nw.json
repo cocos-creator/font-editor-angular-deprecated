@@ -1,0 +1,25 @@
+{
+    "name": "Font Editor",
+    "version": "0.1.0",
+    "description": "",
+    "main": "index.html",
+    "window": {
+        "toolbar": true,
+        "width": 1280,
+        "height": 800
+    },
+    "homepage": "https://github.com/fireball-x/font-editor",
+    "license": "MIT",
+    "licenseUrl": "http://opensource.org/licenses/MIT",
+    "devDependencies": {
+        "gulp": "",
+        "gulp-filter": "",
+        "gulp-clean": "",
+        "gulp-rename": "",
+        "gulp-jshint": "",
+        "jshint-stylish": "",
+        "gulp-uglifyjs": "",
+        "gulp-replace": "",
+        "gulp-qunit": ""
+    }
+}

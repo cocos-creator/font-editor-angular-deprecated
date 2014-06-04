@@ -1,0 +1,202 @@
+$right-sidebar-width: 240px;
+$left-sidebar-width: 48px;
+
+html {
+    background: url(/bin/img/bg-linen.jpg) 50% top;
+}
+
+body {
+    background: transparent;
+}
+
+* {
+    font-family: Arial;
+    box-sizing: border-box;
+
+    /* pointer-events: none; */
+    cursor: default;     
+    user-select: none;        
+    -webkit-user-select: none;
+    -moz-user-select: none;   
+    -ms-user-select: none;    
+}
+
+#atlas-canvas {
+    /* background: url(/bin/img/checkerboard.png); */
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* margin: auto; */
+    /* margin-top: 20px; */
+    /* box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2); */
+    /* border: 2px solid #000; */
+    /* box-sizing: content-box; */
+    /* transition: border-color 0.5s; */
+}
+
+.atlas-item {
+    background-color: rgba( 0, 128, 255, 0.5 );
+    margin: 2px;
+}
+.atlas-item:hover {
+    outline: 1px solid #000;
+}
+
+.panel {
+    background-color: #171717;
+    border: 1px solid #000;
+    color: white;
+}
+
+.workspace {
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    margin-right: $right-sidebar-width;
+    margin-left: $left-sidebar-width;
+}
+
+.left.sidebar {
+    position: fixed;
+    width: $left-sidebar-width;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 2px 0 3px 0 rgba(0,0,0,0.2)
+}
+
+.right.sidebar {
+    position: fixed;
+    width: $right-sidebar-width;;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    box-shadow: -2px 0 3px 0 rgba(0,0,0,0.2)
+}
+
+// ------------------------------------------
+
+.clearfix {                         
+    clear: both;
+}
+
+.tabs {                         
+    border-top: 1px solid black;
+    height: 31px;               
+}                               
+
+.section>.body {                         
+    position: relative;
+    background-color: #333;
+    padding: 8px;
+}
+
+.field {                         
+    position: relative;
+    padding: 4px 0;
+    white-space: nowrap;
+}
+.field:after {                         
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.label {                         
+    float: left;
+    font-size: 11px;
+    text-shadow: 1px 1px 0 #000;
+    color: #bcbcbc;
+    position: relative;
+    text-align: right;
+
+    width: 60px;
+    line-height: 12px;
+    padding: 4px 6px 0 0;
+}
+
+.text-input {                         
+    float: left;
+    /* display: block;          */
+    display: flex;         
+    flex-direction: row;
+    flex-wrap: nowrap;     
+    position: relative;
+    background: #232323;
+    border: 1px solid black;
+    color: #ddd;
+    height: 21px;
+    width: 100px;
+
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1),0px 0 0 1px rgba(255,255,255,0.1);
+    transition: box-shadow .5s ease;
+    -webkit-transition: box-shadow .5s ease;
+}
+.text-input.focused {                         
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1),0px 0 0 1px #0c70a6,0px 0 4px 1px rgba(12,112,166,0.8);
+}
+.text-input>input {                         
+    flex: auto;
+    /* width: 75%; */
+    padding: 3px 4px;
+    display: block;
+    font-size: 12px;
+    text-shadow: 1px 1px 0 #000;
+    border: 0;
+    margin: 0;
+    background: transparent;
+    color: #ddd;
+
+    pointer-events: auto;
+    cursor: auto;
+}
+.text-input>input:focus {                         
+    outline: 0;
+}
+/* Note: A webkit bug that input::selection didn't works   */
+/* .text-input>input::selection {                          */
+/*     background: #f00;                                   */
+/* }                                                       */
+/* .text-input>input::-webkit-input-placeholder {                          */
+/*     font-style: italic;                                                 */
+/* }                                                                       */
+.text-input>.unit {                         
+    flex: 0 0 auto;
+    padding: 2px 3px 1px;
+    margin: 4px 1px 0 0;
+    text-align: center;
+    font-size: 9px;
+    text-transform: uppercase;
+    opacity: .7;
+
+    cursor: pointer;
+}
+.text-input>.unit-buttons {                         
+    flex: 0 0 auto;
+    height: 19px;
+    border-left: 1px solid black;
+}
+.text-input>.unit-buttons>.button {                         
+    display: block;
+    border: 0;
+    margin: 0;
+    width: 9px;
+    height: 9px;
+    background-color: #474747;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset;
+    cursor: auto;
+    padding-left: 2px;
+}
+.text-input>.unit-buttons>.button>i {                         
+    font-size: 9px;
+    color: white;
+    opacity: .5;
+}
+.text-input>.unit-buttons>.sep {                         
+    display: block;
+    height: 1px;
+    background-color: black;
+}
