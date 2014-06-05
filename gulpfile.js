@@ -69,3 +69,25 @@ gulp.task('watch', function() {
 //
 gulp.task('default', ['build', 'fix-source-map'] );
 gulp.task('all', ['default'] );
+
+/* compile node binary plugins for node-webkit
+ *  - Before actually compiling, please meet its requirements (you'll need a proper Python engine and C/C++ compiler)
+ *  - https://github.com/rogerwang/nw-gyp#installation
+ */
+gulp.task('nw', function(callback) {
+    var childProcess = require('child_process');
+    var path = require('path');
+    var buildingPath = path.join(__dirname, 'node_modules', 'fontpath', 'node_modules', 'freetype2');
+    var nwgyp = process.platform === 'win32' ? 'nw-gyp.cmd' : 'nw-gyp';
+    childProcess.execFile(nwgyp, ['rebuild', '--target=0.9.2'], { cwd: buildingPath },
+        function (err, stdout, stderr) {
+            if (err) {
+                console.error(err);
+            }
+            if (stdout) {
+                console.log(stdout);
+            }
+            callback(err);
+        }
+    );
+});

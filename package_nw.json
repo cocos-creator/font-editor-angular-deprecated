@@ -1,5 +1,5 @@
 {
-    "name": "Font Editor",
+    "name": "font-editor",
     "version": "0.1.0",
     "description": "",
     "main": "index.html",
@@ -20,6 +20,8 @@
         "jshint-stylish": "",
         "gulp-uglifyjs": "",
         "gulp-replace": "",
-        "gulp-qunit": ""
+        "gulp-qunit": "",
+        "fontpath": "",
+        "nw-gyp": ""
     }
 }
