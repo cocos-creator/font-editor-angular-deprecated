@@ -17,11 +17,12 @@ var paths = {
     ],
     dest: 'font-editor.min.js',
     dest_dir: 'bin/js',
-    fire: [
+    depends: [
         '../atlas-editor/bin/js/atlas-editor.min.js',
         '../atlas-editor/src/js/workSpace.js',
         '../core/bin/core.min.js',
         '../core/bin/core.dev.js',
+        'src/js/getFontListInNode.js',
     ],
 };
 
@@ -34,7 +35,7 @@ gulp.task('clean', function() {
 
 // copy
 gulp.task('copy', ['clean'], function() {
-    return gulp.src(paths.fire, {write: false})
+    return gulp.src(paths.depends, {write: false})
     .pipe(gulp.dest(paths.dest_dir))
     ;
 });
