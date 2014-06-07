@@ -1,12 +1,14 @@
+var GetFontList = require('font-lib');
+
 var FontEditor = (function () {
     var _super = WorkSpace;
     
     function FontEditor(canvas) {
         _super.call(this, canvas);
 
-        getFontList(function(list) {
+        GetFontList(function(list) {
             _setFontList(this, list);
-        });
+        }, navigator.language);
     }
     var _class = FontEditor;
     FIRE.extend(_class, _super);

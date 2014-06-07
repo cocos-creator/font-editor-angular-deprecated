@@ -6,6 +6,9 @@
     "homepage": "https://github.com/fireball-x/font-editor",
     "license": "MIT",
     "licenseUrl": "http://opensource.org/licenses/MIT",
+    "dependencies": {
+        "font-lib": ""
+    },
     "devDependencies": {
         "gulp": "",
         "gulp-filter": "",
@@ -15,7 +18,6 @@
         "jshint-stylish": "",
         "gulp-uglifyjs": "",
         "gulp-replace": "",
-        "gulp-qunit": "",
-        "fontpath": ""
+        "gulp-qunit": ""
     }
 }

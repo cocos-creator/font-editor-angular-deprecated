@@ -9,6 +9,7 @@ var uglify = require('gulp-uglifyjs');
 var replace = require('gulp-replace');
 var concat = require('gulp-concat');
 var qunit = require('gulp-qunit');
+var Path = require('path');
 
 var paths = {
     src: [
@@ -22,13 +23,12 @@ var paths = {
         '../atlas-editor/src/js/workSpace.js',
         '../core/bin/core.min.js',
         '../core/bin/core.dev.js',
-        'src/js/getFontListInNode.js',
     ],
 };
 
 // clean
 gulp.task('clean', function() {
-    return gulp.src('bin/js/' + paths.dest + '*', {read: false})
+    return gulp.src(['bin/js/*'], {read: false})
     .pipe(clean())
     ;
 });
@@ -78,7 +78,7 @@ gulp.task('all', ['default'] );
 gulp.task('nw', function(callback) {
     var childProcess = require('child_process');
     var path = require('path');
-    var buildingPath = path.join(__dirname, 'node_modules', 'fontpath', 'node_modules', 'freetype2');
+    var buildingPath = path.join(__dirname, 'node_modules', 'font-lib', 'node_modules', 'freetype2');
     var nwgyp = process.platform === 'win32' ? 'nw-gyp.cmd' : 'nw-gyp';
     childProcess.execFile(nwgyp, ['rebuild', '--target=0.9.2'], { cwd: buildingPath },
         function (err, stdout, stderr) {
