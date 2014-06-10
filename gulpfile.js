@@ -19,7 +19,9 @@ var paths = {
     dest: 'font-editor.min.js',
     dest_dir: 'bin/js',
     depends: [
-        '../atlas-editor/bin/js/atlas-editor.min.js',
+        //*'../atlas-editor/bin/js/atlas-editor.min.js',
+        'src/js/fontEditor.js',
+        'src/js/app.js',
         '../atlas-editor/src/js/workSpace.js',
         '../core/bin/core.min.js',
         '../core/bin/core.dev.js',
@@ -46,12 +48,14 @@ gulp.task('build', ['copy'], function() {
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     // .pipe(jshint.reporter('fail')) // disabled
+    ;
+    /*
     .pipe(uglify(paths.dest, {
         outSourceMap: true,
         basePath: 'http://any.url/',  // use relative path to locate to /src/js
     }))
     .pipe(gulp.dest(paths.dest_dir))
-    ;
+    ;*/
 });
 
 // fix source map
