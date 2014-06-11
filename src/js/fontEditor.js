@@ -3,15 +3,23 @@ var GetFontList = require('font-lib');
 var FontEditor = (function () {
     var _super = WorkSpace;
     
+    // ================================================================================
+    /// const
+    // ================================================================================
+
+    var ATLAS_BOUND_COLOR = new paper.Color(85/255, 85/255, 179/255, 0.9);
+    var displayAtlasBound = true;
+
     var SAMPLE_TEXT = 
 //'The quick brown fox jumps over the lazy dog\n' + 
 'abcdefghijklmnopqrstuvwxyz\n' + 
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\n' + 
 '1234567890;:_,.-("*!?\')';
 
-    /** 
-     * constructor
-     */
+    // ================================================================================
+    /// constructor
+    // ================================================================================
+
     function FontEditor(canvas) {
         this.atlas = new FIRE.Atlas();
 
@@ -64,27 +72,18 @@ var FontEditor = (function () {
         this.dashArray = null;
 
         var self = this;
+        console.time('enum fonts');
         GetFontList(function(list) {
+            console.timeEnd('enum fonts');
             _setFontList(self, list);
         }, navigator.language);
     }
     var _class = FontEditor;
     FIRE.extend(_class, _super);
 
-    _class.prototype.repaint = function () {
-        _super.prototype.repaint.call(this);
-        _recreateAtlas(this);
-    };
-
-    _class.prototype._updateCanvas = function () {
-        _updateCanvas(this);
-        this._paperProject.view.update();
-    };
-
-    _class.prototype._recreateBackground = function () {
-        _super.prototype._recreateBackground.call(this);
-        this._border.fillColor = 'white';
-    };
+    // ================================================================================
+    /// properties
+    // ================================================================================
 
     _class.prototype.__defineSetter__('sampleText', function (str) {
         // recreate char table
@@ -100,37 +99,41 @@ var FontEditor = (function () {
                 charTable[char] = tex;
             }
         }
-        //_recreateAtlas(this);
+        if (this.fontFaimly) {
+            this._recreateAtlas(flase);
+        }
     });
 
-    var _initLayers = function (self) {
-        self._charLayer = WorkSpace.createLayer();        // to draw chars
+    // ================================================================================
+    /// public
+    // ================================================================================
 
-        self._cameraLayer.addChildren([
-            // BOTTOM (sorted by create order) -----------
-            self._charLayer,
-            // TOP ---------------------------------------
-        ]);
+
+
+    // ================================================================================
+    /// overridable
+    // ================================================================================
+
+    _class.prototype.repaint = function () {
+        _super.prototype.repaint.call(this);
+        this._recreateAtlas(false);
     };
 
-    var _getRenderBounds = function (strokeBoundsGetter, style) {
-        var leftExpand = style.shadowBlur - style.shadowOffset.x;
-        var rightExpand = style.shadowBlur + style.shadowOffset.x;
-        var topExpand = style.shadowBlur - style.shadowOffset.y;
-        var bottomExpand = style.shadowBlur + style.shadowOffset.y;
-
-        var expandWidth = Math.max(leftExpand, 0) + Math.max(rightExpand, 0);
-        var expandHeight = Math.max(topExpand, 0) + Math.max(bottomExpand, 0);
-
-        return function () {
-            var bounds = strokeBoundsGetter.call(this);
-            return bounds.expand(expandWidth, expandHeight);
-        };
+    _class.prototype._doUpdateCanvas = function () {
+        _super.prototype._doUpdateCanvas.call(this);
+        _updateCanvas(this);
     };
 
-    var _recreateAtlas = function (self) {
+    _class.prototype._recreateBackground = function () {
+        _super.prototype._recreateBackground.call(this);
+        this._border.fillColor = 'white';
+    };
+
+    _class.prototype._recreateAtlas = function (forExport) {
+        var self = this;
 
         // create atlas
+        console.time('create atlas');
 
         self._charLayer.activate();
         var style = {
@@ -185,24 +188,52 @@ var FontEditor = (function () {
                 self.atlas.add(tex);
             }
         }
+        console.timeEnd('create atlas');
 
-        // sort
+        // packing
+        console.time('packing');
         self.atlas.sort();
         self.atlas.layout();
+        console.timeEnd('packing');
         
         // create raster
-        for (var i = 0; i < self.atlas.textures.length; ++i) {
-            var tex = self.atlas.textures[i];
-            // create raster
-            var raster = WorkSpace.createAtlasRaster(tex); 
-            raster.data.texture = tex;
-            // debug rect
-            raster.data.boundsItem = new paper.Shape.Rectangle();
-            raster.bringToFront();
-        }
-
+        var addBounds = !forExport && displayAtlasBound;
+        WorkSpace.createAtlasRasters(self.atlas, addBounds);
+        
         // update
-        _updateCanvas(self);
+        if (!forExport) {
+            _updateCanvas(self);
+        }
+        paper.view.update();
+    };
+
+    // ================================================================================
+    /// private
+    // ================================================================================
+
+    var _initLayers = function (self) {
+        self._charLayer = WorkSpace.createLayer();        // to draw chars
+
+        self._cameraLayer.addChildren([
+            // BOTTOM (sorted by create order) -----------
+            self._charLayer,
+            // TOP ---------------------------------------
+        ]);
+    };
+
+    var _getRenderBounds = function (strokeBoundsGetter, style) {
+        var leftExpand = style.shadowBlur - style.shadowOffset.x;
+        var rightExpand = style.shadowBlur + style.shadowOffset.x;
+        var topExpand = style.shadowBlur - style.shadowOffset.y;
+        var bottomExpand = style.shadowBlur + style.shadowOffset.y;
+
+        var expandWidth = Math.max(leftExpand, 0) + Math.max(rightExpand, 0);
+        var expandHeight = Math.max(topExpand, 0) + Math.max(bottomExpand, 0);
+
+        return function () {
+            var bounds = strokeBoundsGetter.call(this);
+            return bounds.expand(expandWidth, expandHeight);
+        };
     };
 
     var _updateCanvas = function (self) {
@@ -219,14 +250,16 @@ var FontEditor = (function () {
             child.position = [posFilter(tex.x * self._zoom), posFilter(tex.y * self._zoom)];
             child.scaling = [self._zoom, self._zoom];
             // update debug rect
-            var left = posFilter(tex.x * self._zoom);
-            var top = posFilter(tex.y * self._zoom);
-            var w = posFilter(tex.rotatedWidth * self._zoom);
-            var h = posFilter(tex.rotatedHeight * self._zoom);
-            var bounds = child.data.boundsItem;
-            bounds.size = [w, h];
-            bounds.position = new paper.Rectangle(left, top, w, h).center;
-            bounds.fillColor = 'green';
+            if (displayAtlasBound) {
+                var left = posFilter(tex.x * self._zoom);
+                var top = posFilter(tex.y * self._zoom);
+                var w = posFilter(tex.rotatedWidth * self._zoom);
+                var h = posFilter(tex.rotatedHeight * self._zoom);
+                var bounds = child.data.boundsItem;
+                bounds.size = [w, h];
+                bounds.position = new paper.Rectangle(left, top, w, h).center;
+                bounds.fillColor = ATLAS_BOUND_COLOR;
+            }
         }
     }
 
@@ -235,7 +268,7 @@ var FontEditor = (function () {
         if (self.fontList.length > 0) {
             self.fontFamily = self.fontList[0];
         }
-        _recreateAtlas(self);
+        self._recreateAtlas(false);
     };
 
     return _class;
