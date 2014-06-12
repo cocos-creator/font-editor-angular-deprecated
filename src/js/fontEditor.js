@@ -8,7 +8,6 @@ var FontEditor = (function () {
     // ================================================================================
 
     var ATLAS_BOUND_COLOR = new paper.Color(85/255, 85/255, 179/255, 0.9);
-    var displayAtlasBound = true;
 
     var SAMPLE_TEXT = 
 //'The quick brown fox jumps over the lazy dog\n' + 
@@ -22,12 +21,14 @@ var FontEditor = (function () {
 
     function FontEditor(canvas) {
         this.atlas = new FIRE.Atlas();
+        this.atlas.allowRotate = false;
 
         _super.call(this, canvas);
 
         _initLayers(this);
 
         this.sampleText = SAMPLE_TEXT;  // 目前不提供单独的预览功能，sampleText里面包含的所有字符最终都会被输出。
+        this._displayBounds = false;
         
         // font
 
@@ -56,9 +57,9 @@ var FontEditor = (function () {
 
         // shadow
 
-        this.shadowColor = [0, 0, 0, 0.5],
+        this.shadowColor = [0, 0, 0, 0.5];
         this.shadowBlur = 2;
-        this.shadowOffset = new paper.Point(5, 8),
+        this.shadowOffset = new paper.Point(5, 8);
 
         // dash
 
@@ -100,15 +101,23 @@ var FontEditor = (function () {
             }
         }
         if (this.fontFaimly) {
+            this._paperProject.activate();
             this._recreateAtlas(flase);
         }
+    });
+
+    _class.prototype.__defineSetter__('displayBounds', function (value) {
+        this._displayBounds = value;
+        this.repaint();
     });
 
     // ================================================================================
     /// public
     // ================================================================================
 
-
+    _class.prototype.exportBMFontTxt = function () {
+        
+    };
 
     // ================================================================================
     /// overridable
@@ -135,7 +144,6 @@ var FontEditor = (function () {
         // create atlas
         console.time('create atlas');
 
-        self._charLayer.activate();
         var style = {
             'fontFamily': self.fontFamily,
             'fontSize': self.fontSize,
@@ -197,7 +205,11 @@ var FontEditor = (function () {
         console.timeEnd('packing');
         
         // create raster
-        var addBounds = !forExport && displayAtlasBound;
+        var addBounds = !forExport && self._displayBounds;
+        if (!forExport) {
+            self._charLayer.activate();
+            self._charLayer.removeChildren();
+        }
         WorkSpace.createAtlasRasters(self.atlas, addBounds);
         
         // update
@@ -250,7 +262,7 @@ var FontEditor = (function () {
             child.position = [posFilter(tex.x * self._zoom), posFilter(tex.y * self._zoom)];
             child.scaling = [self._zoom, self._zoom];
             // update debug rect
-            if (displayAtlasBound) {
+            if (self._displayBounds) {
                 var left = posFilter(tex.x * self._zoom);
                 var top = posFilter(tex.y * self._zoom);
                 var w = posFilter(tex.rotatedWidth * self._zoom);
@@ -261,13 +273,14 @@ var FontEditor = (function () {
                 bounds.fillColor = ATLAS_BOUND_COLOR;
             }
         }
-    }
+    };
 
     var _setFontList = function (self, list) {
         self.fontList = list;
         if (self.fontList.length > 0) {
             self.fontFamily = self.fontList[0];
         }
+        self._paperProject.activate();
         self._recreateAtlas(false);
     };
 

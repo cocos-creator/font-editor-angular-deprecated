@@ -22,6 +22,7 @@ var paths = {
         //*'../atlas-editor/bin/js/atlas-editor.min.js',
         'src/js/fontEditor.js',
         'src/js/app.js',
+        'src/js/file_utils.js',
         '../atlas-editor/src/js/workSpace.js',
         '../core/bin/core.min.js',
         '../core/bin/core.dev.js',
