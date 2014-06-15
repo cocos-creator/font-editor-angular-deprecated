@@ -1,28 +1,32 @@
 {
-    "name": "font-editor",
-    "version": "0.1.0",
-    "description": "",
-    "main": "index.html",
-    "window": {
-        "toolbar": true,
-        "width": 1280,
-        "height": 800
-    },
-    "homepage": "https://github.com/fireball-x/font-editor",
-    "license": "MIT",
-    "licenseUrl": "http://opensource.org/licenses/MIT",
-    "dependencies": {
-        "font-lib": ""
-    },
-    "devDependencies": {
-        "gulp": "",
-        "gulp-filter": "",
-        "gulp-clean": "",
-        "gulp-rename": "",
-        "gulp-jshint": "",
-        "jshint-stylish": "",
-        "gulp-uglifyjs": "",
-        "gulp-replace": "",
-        "gulp-qunit": ""
-    }
+  "name": "font-editor",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.html",
+  "window": {
+    "toolbar": true,
+    "width": 1280,
+    "height": 800
+  },
+  "homepage": "https://github.com/fireball-x/font-editor",
+  "license": "MIT",
+  "licenseUrl": "http://opensource.org/licenses/MIT",
+  "dependencies": {
+    "font-lib": ""
+  },
+  "devDependencies": {
+    "gulp": "",
+    "gulp-filter": "",
+    "gulp-clean": "",
+    "gulp-rename": "",
+    "gulp-jshint": "",
+    "jshint-stylish": "",
+    "gulp-uglifyjs": "",
+    "gulp-replace": "",
+    "karma": "^0.12.16",
+    "gulp-karma": "0.0.4",
+    "karma-nodewebkit-launcher": "fireball-x/karma-nodewebkit-launcher#NODE_PATH",
+    "qunitjs": "^1.14.0",
+    "karma-qunit": "^0.1.3"
+  }
 }
