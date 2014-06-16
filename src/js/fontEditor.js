@@ -7,9 +7,9 @@ var FontEditor = (function () {
     /// const
     // ================================================================================
 
-    var ATLAS_BOUND_COLOR = new paper.Color(85/255, 85/255, 179/255, 0.9);
+    var _atlasBoundColor = new paper.Color(85/255, 85/255, 179/255, 0.9);
 
-    var SAMPLE_TEXT = 
+    var _sampleText = 
 //'The quick brown fox jumps over the lazy dog\n' + 
 'abcdefghijklmnopqrstuvwxyz\n' + 
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\n' + 
@@ -27,7 +27,7 @@ var FontEditor = (function () {
 
         _initLayers(this);
 
-        this.sampleText = SAMPLE_TEXT;  // 目前不提供单独的预览功能，sampleText里面包含的所有字符最终都会被输出。
+        this.sampleText = _sampleText;  // 目前不提供单独的预览功能，sampleText里面包含的所有字符最终都会被输出。
         this._displayBounds = false;
         
         // font
@@ -79,14 +79,13 @@ var FontEditor = (function () {
             _setFontList(self, list);
         }, navigator.language);
     }
-    var _class = FontEditor;
-    FIRE.extend(_class, _super);
+    FIRE.extend(FontEditor, _super);
 
     // ================================================================================
     /// properties
     // ================================================================================
 
-    _class.prototype.__defineSetter__('sampleText', function (str) {
+    FontEditor.prototype.__defineSetter__('sampleText', function (str) {
         // recreate char table
         this.charTable = {};
 
@@ -106,7 +105,7 @@ var FontEditor = (function () {
         }
     });
 
-    _class.prototype.__defineSetter__('displayBounds', function (value) {
+    FontEditor.prototype.__defineSetter__('displayBounds', function (value) {
         this._displayBounds = value;
         this.repaint();
     });
@@ -115,7 +114,7 @@ var FontEditor = (function () {
     /// public
     // ================================================================================
 
-    _class.prototype.exportBMFontTxt = function () {
+    FontEditor.prototype.exportBMFontTxt = function () {
         
     };
 
@@ -123,22 +122,22 @@ var FontEditor = (function () {
     /// overridable
     // ================================================================================
 
-    _class.prototype.repaint = function () {
+    FontEditor.prototype.repaint = function () {
         _super.prototype.repaint.call(this);
         this._recreateAtlas(false);
     };
 
-    _class.prototype._doUpdateCanvas = function () {
+    FontEditor.prototype._doUpdateCanvas = function () {
         _super.prototype._doUpdateCanvas.call(this);
         _updateCanvas(this);
     };
 
-    _class.prototype._recreateBackground = function () {
+    FontEditor.prototype._recreateBackground = function () {
         _super.prototype._recreateBackground.call(this);
         this._border.fillColor = 'white';
     };
 
-    _class.prototype._recreateAtlas = function (forExport) {
+    FontEditor.prototype._recreateAtlas = function (forExport) {
         var self = this;
 
         // create atlas
@@ -270,7 +269,7 @@ var FontEditor = (function () {
                 var bounds = child.data.boundsItem;
                 bounds.size = [w, h];
                 bounds.position = new paper.Rectangle(left, top, w, h).center;
-                bounds.fillColor = ATLAS_BOUND_COLOR;
+                bounds.fillColor = _atlasBoundColor;
             }
         }
     };
@@ -284,5 +283,5 @@ var FontEditor = (function () {
         self._recreateAtlas(false);
     };
 
-    return _class;
+    return FontEditor;
 })();
