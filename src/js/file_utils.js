@@ -37,6 +37,26 @@ var _savePng = function (canvas, basename, path) {
     }
 };
 
+var _saveText = function (text, filename, path) {
+    var isnw = process && process.versions && process.versions['node-webkit'];
+    if (isnw) {
+        var fs = require('fs');
+        fs.writeFileSync(path, text, {'encoding': 'ascii'});
+    }
+    else {
+        var blob = new Blob([text], {type: "text/plain;charset=utf-8"});    // not support 'application/json'
+        window.navigator.saveBlob = window.navigator.saveBlob || window.navigator.msSaveBlob;
+        if (window.navigator.saveBlob) {
+            window.navigator.saveBlob(blob, filename);
+        }
+        else {
+            var dataUrl = (window.URL || window.webkitURL).createObjectURL(blob);
+            _commonDownload(dataUrl, filename);
+        }
+    }
+    
+};
+
 var getSavePath = function (defaultFilename, preserveDirKey, callback) {
     var chooser = document.createElement('input');
     chooser.type = 'file';

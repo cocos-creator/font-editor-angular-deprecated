@@ -20,9 +20,8 @@ var paths = {
     destDir: 'bin/js',
     copyToDest: [
         '../core/bin/core.dev.js',
-        '../atlas-editor/src/js/workSpace.js',
-        //*'../atlas-editor/bin/js/atlas-editor.min.js',
         'src/js/file_utils.js',
+        'src/js/convert_into_text.js',
         'src/js/fontEditor.js',
         'src/js/app.js',
     ],
@@ -36,14 +35,16 @@ var paths = {
         'bin/js/core.dev.js',
         'bin/js/workSpace.js',
         'bin/js/file_utils.js',
+        'bin/js/convert_into_text.js',
         'bin/js/fontEditor.js',
+        'test/*.js',
         'test/unit/*.js'
     ],
 };
 
 // clean
 gulp.task('clean', function() {
-    return gulp.src(['bin/js/*'], {read: false})
+    return gulp.src(['bin/js/*', '!bin/js/workSpace.js'], {read: false})
     .pipe(clean())
     ;
 });

@@ -15,8 +15,10 @@
         },
         frameworks: ['qunit'],
         plugins: ['karma-qunit', 'karma-nodewebkit-launcher'],
+        reporters: ['dots'],
         files: [
-          '*.js'
-        ]
+          '*.js',
+        ],
+        colors: false,
     });
 };

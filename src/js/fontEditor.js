@@ -1,10 +1,11 @@
-var GetFontList = require('font-lib');
+var Path = require('path');
+var FontLib = require('font-lib');
 
 var FontEditor = (function () {
     var _super = WorkSpace;
     
     // ================================================================================
-    /// const
+    // const
     // ================================================================================
 
     var _atlasBoundColor = new paper.Color(85/255, 85/255, 179/255, 0.9);
@@ -15,8 +16,13 @@ var FontEditor = (function () {
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\n' + 
 '1234567890;:_,.-("*!?\')';
 
+    var _styleFields = ['fontFamily', 'fontSize', 'fontWeight', 
+                        'fillColor', 'strokeColor', 'strokeWidth', 'strokeJoin', 'miterLimit', 
+                        'shadowColor', 'shadowBlur', 'shadowOffset', 
+                        'dashOffset', 'dashArray'];
+
     // ================================================================================
-    /// constructor
+    // constructor
     // ================================================================================
 
     function FontEditor(canvas) {
@@ -27,82 +33,95 @@ var FontEditor = (function () {
 
         _initLayers(this);
 
-        this.sampleText = _sampleText;  // 目前不提供单独的预览功能，sampleText里面包含的所有字符最终都会被输出。
+        this._sampleText = _sampleText; // 目前不提供单独的预览功能，sampleText里面包含的所有字符最终都会被输出。
         this._displayBounds = false;
-        
-        // font
+        this._font = null;              // font obj created by font-lib
+        this._charTable = {};
+        this._sortedCharList = null;    // sorted keys of _charTable
+        this.fontTable = {names: [], paths: []};
+        _updateCharTable(this);
 
-        this.fontFamily = '';
-        this.fontSize = 50;
+        // font --------------------------------
 
-        // color
+        this._fontFamily = '';
+        this._fontSize = 50;
+        // for fonts that provide only normal and bold, 100-500 are normal, and 600-900 are bold.
+        this._fontWeight = 'normal'; // normal(Same as 400) | bold(Same as 700) | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 // bolder lighter
 
-        this.fillColor = 'black';
+        // color --------------------------------
 
-        // stroke
+        this._fillColor = 'black';
 
-        this.strokeColor = 'white';
-        this.strokeWidth = 2;
+        // stroke --------------------------------
+
+        this._strokeColor = 'white';
+        this._strokeWidth = 2;
         /**
          * The shape to be used at the segments and corners of Path items when they have a stroke.
          * String('miter', 'round', 'bevel')
          */
-        this.strokeJoin = 'round';
+        this._strokeJoin = 'round';
         /**
          * When two line segments meet at a sharp angle and miter joins have been specified for item.strokeJoin, 
          * it is possible for the miter to extend far beyond the item.strokeWidth of the path. The miterLimit 
          * imposes a limit on the ratio of the miter length to the item.strokeWidth.
          */
-        this.miterLimit = 10;
+        this._miterLimit = 10;
 
-        // shadow
+        // shadow --------------------------------
 
-        this.shadowColor = [0, 0, 0, 0.5];
-        this.shadowBlur = 2;
-        this.shadowOffset = new paper.Point(5, 8);
+        this._shadowColor = [0, 0, 0, 0.5];
+        this._shadowBlur = 2;
+        this._shadowOffset = new paper.Point(5, 8);
 
-        // dash
+        // dash --------------------------------
 
         /**
          * The dash offset of the stroke.
          */
-        this.dashOffset = 0;
+        this._dashOffset = 0;
         /**
          * Specifies an array containing the dash and gap lengths of the stroke.
          */
-        this.dashArray = null;
+        this._dashArray = null;
 
         var self = this;
         console.time('enum fonts');
-        GetFontList(function(list) {
+        FontLib.getFontTable(function(data) {
             console.timeEnd('enum fonts');
-            _setFontList(self, list);
+            _setFontTable(self, data);
         }, navigator.language);
     }
     FIRE.extend(FontEditor, _super);
 
     // ================================================================================
-    /// properties
+    // properties
     // ================================================================================
 
-    FontEditor.prototype.__defineSetter__('sampleText', function (str) {
-        // recreate char table
-        this.charTable = {};
+    var defineGetter = function (constructor, fieldList) {
+        fieldList.forEach(function (field) {
+            var _field = '_' + field;
+            constructor.prototype.__defineGetter__(field, function () {
+                return this[_field];
+            });
+        });
+    };
 
-        var charTable = this.charTable;
-        var atlas = this.atlas;
-        for (var i = 0, len = str.length; i < len; ++i) {
-            var char = str[i];
-            var spriteTex = charTable[char];
-            if (!spriteTex) {
-                var tex = null;
-                charTable[char] = tex;
-            }
-        }
-        if (this.fontFaimly) {
-            this._paperProject.activate();
-            this._recreateAtlas(flase);
-        }
+    defineGetter (FontEditor, _styleFields);
+    defineGetter (FontEditor, ['sampleText', 'displayBounds']);
+
+    // define setter for style fields
+    _styleFields.forEach(function (field) {
+        var _field = '_' + field;
+        FontEditor.prototype.__defineSetter__(field, function (val) {
+            this[_field] = val;
+            this._recreateAtlas(false);
+        });
+    });
+
+    FontEditor.prototype.__defineSetter__('sampleText', function (str) {
+        this._sampleText = sampleText;
+        _updateCharTable();
     });
 
     FontEditor.prototype.__defineSetter__('displayBounds', function (value) {
@@ -111,15 +130,27 @@ var FontEditor = (function () {
     });
 
     // ================================================================================
-    /// public
+    // public
     // ================================================================================
 
-    FontEditor.prototype.exportBMFontTxt = function () {
-        
+    FontEditor.prototype.exportBmFontTxt = function (file) {
+        // build char list
+        this._sortedCharList = Object.keys(this._charTable);
+        this._sortedCharList.sort();
+
+        // build data
+        var data = {};
+        _buildBmFontInfo(this, data, file);
+        _buildBmGlyphData(this, data);
+
+        // to string
+        var text = convertIntoText(data);
+
+        return text;
     };
 
     // ================================================================================
-    /// overridable
+    // overridable
     // ================================================================================
 
     FontEditor.prototype.repaint = function () {
@@ -139,29 +170,20 @@ var FontEditor = (function () {
 
     FontEditor.prototype._recreateAtlas = function (forExport) {
         var self = this;
+        console.log('_recreateAtlas font family: ' + self.fontFamily);
 
         // create atlas
         console.time('create atlas');
 
-        var style = {
-            'fontFamily': self.fontFamily,
-            'fontSize': self.fontSize,
-            'fillColor': self.fillColor,
-            'strokeColor': self.strokeColor,
-            'strokeWidth': self.strokeWidth,
-            'strokeJoin': self.strokeJoin,
-            'miterLimit': self.miterLimit,
-            'shadowColor': self.shadowColor,
-            'shadowBlur': self.shadowBlur,
-            'shadowOffset': self.shadowOffset,
-            'dashOffset': self.dashOffset,
-            'dashArray': self.dashArray,
-        };
+        var style = {};
+        _styleFields.forEach(function (field) {
+            style[field] = self['_' + field];
+        });
         var text = new paper.PointText(paper.Item.NO_INSERT);
-        text.getStrokeBounds = _getRenderBounds(text.getStrokeBounds, style);   // HACK: reserve shadow's size when rasterizing
+        text.getStrokeBounds = _getRenderBounds(text.getStrokeBounds, style);   // reserve shadow's size when rasterizing
 
         self.atlas.clear();
-        for (var char in self.charTable) {
+        for (var char in self._charTable) {
             text.style = style;
             text.content = char;
 
@@ -181,7 +203,7 @@ var FontEditor = (function () {
             // create texture
             var tex = new FIRE.SpriteTexture(img);
             tex.name = char;
-            self.charTable[char] = tex;
+            self._charTable[char] = tex;
             
             // get trim rect to caculate actual size including shadow
             var trimRect = FIRE.getTrimRect(canvas, self.atlas.trimThreshold);
@@ -219,7 +241,7 @@ var FontEditor = (function () {
     };
 
     // ================================================================================
-    /// private
+    // private
     // ================================================================================
 
     var _initLayers = function (self) {
@@ -230,6 +252,27 @@ var FontEditor = (function () {
             self._charLayer,
             // TOP ---------------------------------------
         ]);
+    };
+
+    var _updateCharTable = function (self) {
+        self._charTable = {};
+        self._sortedCharList = null;
+
+        var charTable = self._charTable;
+        var text = self._sampleText;
+        var atlas = self.atlas;
+        for (var i = 0, len = text.length; i < len; ++i) {
+            var char = text[i];
+            var spriteTex = charTable[char];
+            if (!spriteTex) {
+                var tex = null;
+                charTable[char] = tex;
+            }
+        }
+        if (self.fontFaimly) {
+            self._paperProject.activate();
+            self._recreateAtlas(flase);
+        }  
     };
 
     var _getRenderBounds = function (strokeBoundsGetter, style) {
@@ -274,13 +317,87 @@ var FontEditor = (function () {
         }
     };
 
-    var _setFontList = function (self, list) {
-        self.fontList = list;
-        if (self.fontList.length > 0) {
-            self.fontFamily = self.fontList[0];
+    var _setFontTable = function (self, data) {
+        console.log(data);
+        self.fontTable = data;
+        if (data.names.length > 0) {
+            self.fontFamily = data.names[0];
+            self._font = FontLib.loadFont(data.paths[0]);
         }
         self._paperProject.activate();
-        self._recreateAtlas(false);
+        //self._recreateAtlas(false);
+    };
+
+    var _buildBmFontInfo = function (self, data, file) {
+        // set info
+        data.face = self._fontFamily;
+        data.size = self._fontSize;
+        var boldStyles = ['bold', '600', '700', '800', '900', 'bolder'];
+        var bold = boldStyles.indexOf(self._fontWeight) !== -1;
+        data.bold = (bold ? 1 : 0);
+        data.italic = 0;    // TODO 保存skew
+        data.charset = "";  // not used
+        data.unicode = 1;   // not used
+        data.stretchH = 100;// not used
+        data.smooth = 1;    // not used
+        data.aa = 1;        // not used
+        data.padding = [0, 0, 0, 0];        // not used
+        var spacing = self.atlas.customPadding;
+        data.spacing = [spacing, spacing];
+        data.outline = 1;   // not used
+
+        // set common
+        self._font.setSize(self._fontSize);
+        data.lineHeight = self._font.size.height;
+        data.base = self._font.size.ascender;
+        data.scaleW = self.atlas.width;
+        data.scaleH = self.atlas.height;
+        data.pages = 1;     // not used
+        data.packed = 0;    // not used
+
+        // set page
+        data.id = 0;        // not used
+        data.file = file;
+
+        // chars count
+        data.count = self._sortedCharList.length;
+
+        return data;
+    };
+
+    var _buildBmGlyphData = function (self, data) {
+        self._font.setSize(self._fontSize);
+
+        var output = [];
+        data.charList = output;
+
+        var id = 0, x = 0, y = 0, width = 0, height = 0, xoffset = 0, yoffset = 0, xadvance = 0,/* page = 0, chnl = 0,*/ letter = '';
+        var charList = self._sortedCharList;
+        var charTable = self._charTable;
+        for (var i = 0, len = charList.length; i < len; i++) {
+            letter = charList[i];
+            var tex = charTable[letter];
+            if (!tex) {
+                continue;
+            }
+            id = letter.charCodeAt(0);
+            x = tex.x;
+            y = tex.y;
+            width = tex.width;
+            height = tex.height;
+            xoffset = tex.trimX;
+            yoffset = tex.trimY;
+            xadvance = self._font.getAdvanceX(letter) | 0;
+            if (letter === ' ') {
+                letter = 'space';
+            }
+            output.push([id, x, y, width, height, xoffset, yoffset, xadvance,/* page, chnl,*/ letter]);
+        }
+    };
+
+    FontEditor.__testOnly__ = {
+        buildBmFontInfo: _buildBmFontInfo,
+        buildBmGlyphData: _buildBmGlyphData,
     };
 
     return FontEditor;

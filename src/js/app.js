@@ -34,13 +34,15 @@ angular.element(document).ready(function() {
 });
 
 app.testExport = function () {
-    getSavePath(app.fontEditor.fontFamily + '.txt', 'exportBmFont', function (path) {
-        var pngPath = modifyExtension(path, '.png');
+    getSavePath(app.fontEditor.fontFamily + '.txt', 'exportBmFont', function (txtPath) {
+        var pngPath = modifyExtension(txtPath, '.png');
         var Path = require('path');
-        var basename = Path.basename(path, Path.extname(path));
+        var basename = Path.basename(txtPath, Path.extname(txtPath));
 
         var canvas = app.fontEditor.paintNewCanvas();
         _savePng(canvas, basename, pngPath);
+        var txt = app.fontEditor.exportBmFontTxt(Path.basename(pngPath));
+        _saveText(txt, basename + Path.extname(txtPath), txtPath);
 
         nwgui.Shell.showItemInFolder(pngPath);
     });
