@@ -11,7 +11,7 @@ var FontEditor = (function () {
     var _atlasBoundColor = new paper.Color(85/255, 85/255, 179/255, 0.9);
 
     var _sampleText = 
-//'The quick brown fox jumps over the lazy dog\n' + 
+'The quick brown fox jumps over the lazy dog\n' + 
 'abcdefghijklmnopqrstuvwxyz\n' + 
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\n' + 
 '1234567890;:_,.-("*!?\')';
@@ -134,7 +134,7 @@ var FontEditor = (function () {
     // ================================================================================
 
     FontEditor.prototype.exportBmFontTxt = function (file) {
-        // build char list
+        // build sorted char list
         this._sortedCharList = Object.keys(this._charTable);
         this._sortedCharList.sort();
 
@@ -190,7 +190,7 @@ var FontEditor = (function () {
             // check valid
             var bounds = text.bounds;
             if (bounds.area === 0) {
-                continue;
+                continue;   // wont skip space, but return
             }
 
             // create image
@@ -212,7 +212,7 @@ var FontEditor = (function () {
             tex.width = trimRect.width;
             tex.height = trimRect.height;
 
-            // if visible, pack it
+            // if visible, pack it into atlas
             if (tex.width > 0 && tex.height > 0) {
                 self.atlas.add(tex);
             }
@@ -387,7 +387,7 @@ var FontEditor = (function () {
             height = tex.height;
             xoffset = tex.trimX;
             yoffset = tex.trimY;
-            xadvance = self._font.getAdvanceX(letter) | 0;
+            xadvance = Math.round(self._font.getAdvanceX(letter));
             if (letter === ' ') {
                 letter = 'space';
             }
