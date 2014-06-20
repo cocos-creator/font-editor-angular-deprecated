@@ -5,16 +5,20 @@ var used = ['face', 'size', 'bold', 'padding', 'spacing', 'lineHeight', 'base', 
 var fontData = {};
 
 var testFontData = function (fontEditorMocker, fontData, expectedHeader, expectedCharList) {
-    FontEditor.__testOnly__.buildBmFontInfo(fontEditorMocker, fontData, 'catman.png');
+    // test header
+    FontEditor.__testOnly__._buildBmFontInfo(fontEditorMocker, fontData, 'catman.png');
     for (var i = 0; i < used.length; i++) {
         var field = used[i];
         deepEqual(fontData[field], expectedHeader[field], 'get ' + field);
     }
 
-    FontEditor.__testOnly__.buildBmGlyphData(fontEditorMocker, fontData);
+    // test glyph
+    FontEditor.__testOnly__._buildBmGlyphData(fontEditorMocker, fontData);
     equal(fontData.charList.length, fontData.count, 'count should match up with char list');
-
     deepEqual(fontData.charList, expectedCharList, 'get chars');
+
+    // test kerning
+    FontEditor.__testOnly__._buildBmKerningData(fontEditorMocker, fontData);
 }
 
 test('build font data', function() {
@@ -40,6 +44,7 @@ test('build font data', function() {
             },
         },
     };
+    fontEditorMocker._font.setSize(fontEditorMocker._fontSize);
 
     // test f, one char
     var expected = {
@@ -78,12 +83,17 @@ test('build font data', function() {
 
 test('export text', function () {
     var text = convertIntoText(fontData);
-    var expected = 'info face="catman" size=262 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1\n' +
-                   'common lineHeight=251 base=188 scaleW=512 scaleH=512 pages=1 packed=0\n' +
-                   'page id=0 file="catman.png"\n' +
-                   'chars count=2\n' +
-                   'char id=32     x=123   y=456   width=0     height=0     xoffset=0     yoffset=189   xadvance=65    page=0 chnl=0 letter="space"\n' +
-                   'char id=102    x=1718  y=443   width=125   height=189   xoffset=6     yoffset=0     xadvance=132   page=0 chnl=0 letter="f"\n';
+    var expected = [
+        'info face="catman" size=262 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1',
+        'common lineHeight=251 base=188 scaleW=512 scaleH=512 pages=1 packed=0',
+        'page id=0 file="catman.png"',
+        'chars count=2',
+        'char id=32     x=123   y=456   width=0     height=0     xoffset=0     yoffset=189   xadvance=65    page=0 chnl=0 letter="space"',
+        'char id=102    x=1718  y=443   width=125   height=189   xoffset=6     yoffset=0     xadvance=132   page=0 chnl=0 letter="f"',
+        /*'kernings count=2',
+        'kerning first=32 second=102 amount=-3',
+        'kerning first=102 second=32 amount=3',*/
+        ''].join('\n');
     equal(text, expected, 'test');
 });
 

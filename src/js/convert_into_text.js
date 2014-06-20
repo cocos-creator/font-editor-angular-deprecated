@@ -41,8 +41,8 @@ var convertIntoText = function (data) {
 
     // build chars
     var charList = data.charList;
-    for (var j = 0, len = charList.length; j < len; j++) {
-        var row = charList[j];
+    for (i = 0, len = charList.length; i < len; i++) {
+        var row = charList[i];
         text += '\nchar id=';
         text += padRight(row[0], 7);
         text += 'x=';
@@ -67,6 +67,22 @@ var convertIntoText = function (data) {
     text += '\n';
 
     // build kernings
+    var kerningList = data.kerningList;
+    if (kerningList && kerningList.length > 0) {
+        var kerningCount = kerningList.length;
+        text += 'kernings count=';
+        text += kerningCount;
+        for (i = 0; i < kerningCount; i++) {
+            var row = kerningList[i];
+            text += '\nkerning first=';
+            text += padRight(row[0], 7);
+            text += 'second=';
+            text += padRight(row[1], 7);
+            text += 'amount=';
+            text += row[2];
+        }
+        text += '\n';
+    }
 
     return text;
 }

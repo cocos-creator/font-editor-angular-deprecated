@@ -134,6 +134,8 @@ var FontEditor = (function () {
     // ================================================================================
 
     FontEditor.prototype.exportBmFontTxt = function (file) {
+        this._font.setSize(this._fontSize);
+
         // build sorted char list
         this._sortedCharList = Object.keys(this._charTable);
         this._sortedCharList.sort();
@@ -142,6 +144,7 @@ var FontEditor = (function () {
         var data = {};
         _buildBmFontInfo(this, data, file);
         _buildBmGlyphData(this, data);
+        _buildBmKerningData(this, data);
 
         // to string
         var text = convertIntoText(data);
@@ -320,9 +323,10 @@ var FontEditor = (function () {
     var _setFontTable = function (self, data) {
         console.log(data);
         self.fontTable = data;
-        if (data.names.length > 0) {
-            self.fontFamily = data.names[0];
-            self._font = FontLib.loadFont(data.paths[0]);
+        var fontIndex = 16;
+        if (data.names.length > fontIndex) {
+            self.fontFamily = data.names[fontIndex];
+            self._font = FontLib.loadFont(data.paths[fontIndex]);
         }
         self._paperProject.activate();
         //self._recreateAtlas(false);
@@ -347,7 +351,6 @@ var FontEditor = (function () {
         data.outline = 1;   // not used
 
         // set common
-        self._font.setSize(self._fontSize);
         data.lineHeight = self._font.size.height;
         data.base = self._font.size.ascender;
         data.scaleW = self.atlas.width;
@@ -366,14 +369,16 @@ var FontEditor = (function () {
     };
 
     var _buildBmGlyphData = function (self, data) {
-        self._font.setSize(self._fontSize);
-
         var output = [];
         data.charList = output;
 
         var id = 0, x = 0, y = 0, width = 0, height = 0, xoffset = 0, yoffset = 0, xadvance = 0,/* page = 0, chnl = 0,*/ letter = '';
+        // cached variables
         var charList = self._sortedCharList;
         var charTable = self._charTable;
+        var round = Math.round;
+        var font = self._font;
+
         for (var i = 0, len = charList.length; i < len; i++) {
             letter = charList[i];
             var tex = charTable[letter];
@@ -387,7 +392,7 @@ var FontEditor = (function () {
             height = tex.height;
             xoffset = tex.trimX;
             yoffset = tex.trimY;
-            xadvance = Math.round(self._font.getAdvanceX(letter));
+            xadvance = round(font.getAdvanceX(letter));
             if (letter === ' ') {
                 letter = 'space';
             }
@@ -395,9 +400,43 @@ var FontEditor = (function () {
         }
     };
 
+    var _buildBmKerningData = function (self, data) {
+        var hasKerning = (self._font.face_flags & FontLib.FT.FACE_FLAG_KERNING) > 0;
+        if (hasKerning === false) {
+            return;
+        }
+        var output = [];
+        data.kerningList = output;
+
+        // predefined variables
+        var first = 0, second = 0, amount = 0, firstCharIndex = 0, secondCharIndex = 0, error = 0;
+        var kerningVec = {x: 0, y: 0};
+        // cached variables
+        var charList = self._sortedCharList;
+        var font = this._font;
+        var kerningMode = FontLib.FT.KERNING_DEFAULT;
+        var getCharIndex = FontLib.FT.Get_Char_Index;
+        var getKerning = FontLib.FT.Get_Kerning;
+        
+        for (var i = 0, len = charList.length; i < len; i++) {
+            first = charList[i].charCodeAt(0);
+            firstCharIndex = getCharIndex(font, first);
+            for (var j = 0; j < len; j++) {
+                second = charList[j].charCodeAt(0);
+                secondCharIndex = getCharIndex(font, second);
+
+                error = getKerning(font, firstCharIndex, secondCharIndex, kerningMode, kerningVec);
+                if (!error && kerningVec.x !== 0) {
+                    output.push([first, second, kerningVec.x / 64]);
+                } 
+            }
+        }
+    };
+
     FontEditor.__testOnly__ = {
-        buildBmFontInfo: _buildBmFontInfo,
-        buildBmGlyphData: _buildBmGlyphData,
+        _buildBmFontInfo: _buildBmFontInfo,
+        _buildBmGlyphData: _buildBmGlyphData,
+        _buildBmKerningData: _buildBmKerningData,
     };
 
     return FontEditor;
