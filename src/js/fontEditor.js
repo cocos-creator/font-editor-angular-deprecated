@@ -392,11 +392,16 @@ var FontEditor = (function () {
             height = tex.height;
             xoffset = tex.trimX;
             yoffset = tex.trimY;
-            xadvance = round(font.getAdvanceX(letter));
-            if (letter === ' ') {
-                letter = 'space';
+            xadvance = font.getAdvanceX(letter);
+            if (xadvance !== null) {
+                if (letter === ' ') {
+                    letter = 'space';
+                }
+                output.push([id, x, y, width, height, xoffset, yoffset, round(xadvance),/* page, chnl,*/ letter]);
             }
-            output.push([id, x, y, width, height, xoffset, yoffset, xadvance,/* page, chnl,*/ letter]);
+            else {
+                console.warn('failed to load char code: ' + id);
+            }
         }
     };
 
@@ -413,7 +418,7 @@ var FontEditor = (function () {
         var kerningVec = {x: 0, y: 0};
         // cached variables
         var charList = self._sortedCharList;
-        var font = this._font;
+        var font = self._font;
         var kerningMode = FontLib.FT.KERNING_DEFAULT;
         var getCharIndex = FontLib.FT.Get_Char_Index;
         var getKerning = FontLib.FT.Get_Kerning;
@@ -421,10 +426,15 @@ var FontEditor = (function () {
         for (var i = 0, len = charList.length; i < len; i++) {
             first = charList[i].charCodeAt(0);
             firstCharIndex = getCharIndex(font, first);
+            if (firstCharIndex === 0) {
+                continue;
+            }
             for (var j = 0; j < len; j++) {
                 second = charList[j].charCodeAt(0);
                 secondCharIndex = getCharIndex(font, second);
-
+                if (secondCharIndex === 0) {
+                    continue;
+                }
                 error = getKerning(font, firstCharIndex, secondCharIndex, kerningMode, kerningVec);
                 if (!error && kerningVec.x !== 0) {
                     output.push([first, second, kerningVec.x / 64]);
