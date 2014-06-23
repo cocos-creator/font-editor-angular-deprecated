@@ -279,17 +279,18 @@ var FontEditor = (function () {
     };
 
     var _getRenderBounds = function (strokeBoundsGetter, style) {
-        var leftExpand = style.shadowBlur - style.shadowOffset.x;
-        var rightExpand = style.shadowBlur + style.shadowOffset.x;
-        var topExpand = style.shadowBlur - style.shadowOffset.y;
-        var bottomExpand = style.shadowBlur + style.shadowOffset.y;
-
-        var expandWidth = Math.max(leftExpand, 0) + Math.max(rightExpand, 0);
-        var expandHeight = Math.max(topExpand, 0) + Math.max(bottomExpand, 0);
+        var leftExpand = Math.max(style.shadowBlur - style.shadowOffset.x, 0);
+        var rightExpand = Math.max(style.shadowBlur + style.shadowOffset.x, 0);
+        var topExpand = Math.max(style.shadowBlur - style.shadowOffset.y, 0);
+        var bottomExpand = Math.max(style.shadowBlur + style.shadowOffset.y, 0);
 
         return function () {
             var bounds = strokeBoundsGetter.call(this);
-            return bounds.expand(expandWidth, expandHeight);
+            bounds.left -= leftExpand;
+            bounds.right += rightExpand;
+            bounds.top -= topExpand;
+            bounds.bottom += bottomExpand;
+            return bounds;
         };
     };
 
