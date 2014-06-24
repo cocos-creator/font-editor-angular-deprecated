@@ -13,18 +13,17 @@ var Path = require('path');
 
 var paths = {
     src: [
+        'src/js/file_utils.js',
+        'src/js/convert_into_text.js',
+        'src/js/font_renderer_fontpath.js',
+        //'src/js/font_renderer_paper.js',
         'src/js/fontEditor.js',
-        'src/js/app.js',
+        'src/js/app.js'
     ],
     //dest: 'font-editor.min.js',
     destDir: 'bin/js',
-    copyToDest: [
+    depends: [
         '../core/bin/core.dev.js',
-        'src/js/file_utils.js',
-        'src/js/convert_into_text.js',
-        'src/js/font_renderer_paper.js',
-        'src/js/fontEditor.js',
-        'src/js/app.js',
     ],
     ext: [
         'ext/angular/angular.js',
@@ -52,7 +51,7 @@ gulp.task('clean', function() {
 
 // copy
 gulp.task('copy', ['clean'], function() {
-    return gulp.src(paths.copyToDest, {write: false})
+    return gulp.src(paths.depends.concat(paths.src), {write: false})
     .pipe(gulp.dest(paths.destDir))
     ;
 });
@@ -98,6 +97,11 @@ gulp.task('test', ['default'], function() {
 // watch
 gulp.task('watch', function() {
     gulp.watch(paths.src, ['default']);
+});
+
+// auto copy scripts from src to bin
+gulp.task('watchjs', function() {
+    gulp.watch(paths.src, ['copy']);
 });
 
 //

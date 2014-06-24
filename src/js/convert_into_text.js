@@ -41,8 +41,8 @@ var convertIntoText = function (data) {
 
     // build chars
     var charList = data.charList;
-    for (i = 0, len = charList.length; i < len; i++) {
-        var row = charList[i];
+    for (i = 0, len = charList.length, row; i < len; i++) {
+        row = charList[i];
         text += '\nchar id=';
         text += padRight(row[0], 7);
         text += 'x=';
@@ -85,7 +85,7 @@ var convertIntoText = function (data) {
     }
 
     return text;
-}
+};
 
 var padRight = (function () {
     var paddings = [
@@ -104,5 +104,5 @@ var padRight = (function () {
     return function (toPad, paddedWidth) {
         toPad = '' + toPad;
         return toPad + paddings[paddedWidth - toPad.length];
-    }
+    };
 })();

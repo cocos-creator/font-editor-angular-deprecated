@@ -17,8 +17,9 @@ var _saveDataUrl = function (dataUrl, path) {
 // 暂时从atlas-editor复制过来，之后应该统一
 var _savePng = function (canvas, basename, path) {
     var isnw = process && process.versions && process.versions['node-webkit'];
+    var pngDataUrl;
     if (isnw) {
-        var pngDataUrl = canvas.toDataURL("image/png");
+        pngDataUrl = canvas.toDataURL("image/png");
         _saveDataUrl(pngDataUrl, path);
     }
     else {
@@ -31,7 +32,7 @@ var _savePng = function (canvas, basename, path) {
             window.navigator.saveBlob(blobBuilderObject.getBlob(), basename + ".png"); // Move the builder object content to a blob and save it to a file.
         }
         else {
-            var pngDataUrl = canvas.toDataURL("image/png");
+            pngDataUrl = canvas.toDataURL("image/png");
             _commonDownload(pngDataUrl, basename + ".png");
         }
     }

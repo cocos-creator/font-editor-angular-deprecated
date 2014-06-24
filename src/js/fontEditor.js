@@ -368,7 +368,8 @@ var FontEditor = (function () {
                 if (letter === ' ') {
                     letter = 'space';
                 }
-                output.push([id, x, y, width, height, xoffset, yoffset, round(xadvance),/* page, chnl,*/ letter]);
+                xadvance = round(xadvance);
+                output.push([id, x, y, width, height, xoffset, yoffset, xadvance,/* page, chnl,*/ letter]);
             }
             else {
                 console.warn('failed to load char code: ' + id);
