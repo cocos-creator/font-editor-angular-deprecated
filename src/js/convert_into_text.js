@@ -75,10 +75,10 @@ var convertIntoText = function (data) {
         for (i = 0; i < kerningCount; i++) {
             var row = kerningList[i];
             text += '\nkerning first=';
-            text += padRight(row[0], 7);
-            text += 'second=';
-            text += padRight(row[1], 7);
-            text += 'amount=';
+            text += row[0];
+            text += ' second=';
+            text += row[1];
+            text += ' amount=';
             text += row[2];
         }
         text += '\n';

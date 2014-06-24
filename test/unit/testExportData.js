@@ -146,7 +146,7 @@ test('export text', function () {
         'char id=74     x=1718  y=443   width=125   height=189   xoffset=6     yoffset=0     xadvance=49    page=0 chnl=0 letter="J"',
         'char id=106    x=123   y=456   width=0     height=0     xoffset=0     yoffset=189   xadvance=19    page=0 chnl=0 letter="j"',
         'kernings count=1',
-        'kerning first=106    second=106    amount=4',
+        'kerning first=106 second=106 amount=4',
         ''].join('\n');
     equal(text, expected, 'test');
 });
