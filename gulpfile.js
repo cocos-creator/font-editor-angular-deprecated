@@ -22,6 +22,7 @@ var paths = {
         '../core/bin/core.dev.js',
         'src/js/file_utils.js',
         'src/js/convert_into_text.js',
+        'src/js/font_renderer_paper.js',
         'src/js/fontEditor.js',
         'src/js/app.js',
     ],

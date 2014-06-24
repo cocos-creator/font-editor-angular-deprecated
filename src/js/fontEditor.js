@@ -182,34 +182,21 @@ var FontEditor = (function () {
         _styleFields.forEach(function (field) {
             style[field] = self['_' + field];
         });
-        var text = new paper.PointText(paper.Item.NO_INSERT);
-        text.getStrokeBounds = _getRenderBounds(text.getStrokeBounds, style);   // reserve shadow's size when rasterizing
 
         self.atlas.clear();
+        var fontRenderer = new fontRenderer_paper(style);
         for (var char in self._charTable) {
-            text.style = style;
-            text.content = char;
-
-            // check valid
-            var bounds = text.bounds;
-            if (bounds.area === 0) {
-                continue;   // wont skip space, but return
+            var img = fontRenderer.render(char);
+            if (!img) {
+                continue;   // skip invisible
             }
-
-            // create image
-            var img = document.createElement('img');
-            var raster = text.rasterize();
-            var canvas = raster.canvas;
-            img.src = canvas.toDataURL('image/png');
-            //console.log('char: ' + char + ' w: ' + img.width + ' h: ' + img.height/* + ' s: ' + img.src*/);
-
             // create texture
             var tex = new FIRE.SpriteTexture(img);
             tex.name = char;
             self._charTable[char] = tex;
             
             // get trim rect to caculate actual size including shadow
-            var trimRect = FIRE.getTrimRect(canvas, self.atlas.trimThreshold);
+            var trimRect = FIRE.getTrimRect(img, self.atlas.trimThreshold);
             tex.trimX = trimRect.x;
             tex.trimY = trimRect.y;
             tex.width = trimRect.width;
@@ -221,7 +208,6 @@ var FontEditor = (function () {
             }
         }
         console.timeEnd('create atlas');
-
         // packing
         console.time('packing');
         self.atlas.sort();
@@ -276,22 +262,6 @@ var FontEditor = (function () {
             self._paperProject.activate();
             self._recreateAtlas(flase);
         }  
-    };
-
-    var _getRenderBounds = function (strokeBoundsGetter, style) {
-        var leftExpand = Math.max(style.shadowBlur - style.shadowOffset.x, 0);
-        var rightExpand = Math.max(style.shadowBlur + style.shadowOffset.x, 0);
-        var topExpand = Math.max(style.shadowBlur - style.shadowOffset.y, 0);
-        var bottomExpand = Math.max(style.shadowBlur + style.shadowOffset.y, 0);
-
-        return function () {
-            var bounds = strokeBoundsGetter.call(this);
-            bounds.left -= leftExpand;
-            bounds.right += rightExpand;
-            bounds.top -= topExpand;
-            bounds.bottom += bottomExpand;
-            return bounds;
-        };
     };
 
     var _updateCanvas = function (self) {
