@@ -12,14 +12,15 @@
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "dependencies": {
-    "font-lib": ""
+    "font-lib": "",
+    "fontpath-canvas": "~1.0.1"
   },
   "devDependencies": {
     "gulp": "",
     "gulp-clean": "",
     "gulp-filter": "",
     "gulp-jshint": "",
-    "gulp-karma": "0.0.4",
+    "gulp-karma": "~0.0.4",
     "gulp-rename": "",
     "gulp-replace": "",
     "gulp-uglifyjs": "",

@@ -15,7 +15,7 @@ var paths = {
     src: [
         'src/js/file_utils.js',
         'src/js/convert_into_text.js',
-        'src/js/font_renderer_fontpath.js',
+        'src/js/font_renderer_path.js',
         //'src/js/font_renderer_paper.js',
         'src/js/fontEditor.js',
         'src/js/app.js'

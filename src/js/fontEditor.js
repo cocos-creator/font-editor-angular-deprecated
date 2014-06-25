@@ -184,7 +184,7 @@ var FontEditor = (function () {
         });
 
         self.atlas.clear();
-        var fontRenderer = new fontRenderer_paper(style);
+        var fontRenderer = new fontRenderer_path(style);
         for (var char in self._charTable) {
             var img = fontRenderer.render(char);
             if (!img) {
@@ -194,8 +194,7 @@ var FontEditor = (function () {
             var tex = new FIRE.SpriteTexture(img);
             tex.name = char;
             self._charTable[char] = tex;
-            
-            // get trim rect to caculate actual size including shadow
+            // get trim rect to caculate actual size including effects
             var trimRect = FIRE.getTrimRect(img, self.atlas.trimThreshold);
             tex.trimX = trimRect.x;
             tex.trimY = trimRect.y;

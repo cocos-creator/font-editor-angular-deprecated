@@ -2,7 +2,7 @@
     this.textItem = new paper.PointText(paper.Item.NO_INSERT);
     this.textItem.style = style;
     // reserve shadow's size when rasterizing
-    this.textItem.getStrokeBounds = fontRenderer_paper._getFixedRenderBounds(this.textItem.getStrokeBounds, style);
+    this.textItem.getStrokeBounds = fontRenderer_paper._fixedRenderBounds(this.textItem.getStrokeBounds, style);
 };
 
 fontRenderer_paper.prototype.render = function (char) {
@@ -23,7 +23,7 @@ fontRenderer_paper.prototype.render = function (char) {
     }
 };
 
-fontRenderer_paper._getFixedRenderBounds = function (strokeBoundsGetter, style) {
+fontRenderer_paper._fixedRenderBounds = function (strokeBoundsGetter, style) {
     var leftExpand = Math.max(style.shadowBlur - style.shadowOffset.x, 0);
     var rightExpand = Math.max(style.shadowBlur + style.shadowOffset.x, 0);
     var topExpand = Math.max(style.shadowBlur - style.shadowOffset.y, 0);
