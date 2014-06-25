@@ -1,15 +1,74 @@
 ﻿var CanvasRenderer = require('fontpath-canvas');
+var FontLib = require('font-lib');
 
-var Path = require('path');
-var fontPath = './node_modules/fontpath-canvas/node_modules/fontpath-test-fonts/lib/Inconsolata.otf';
-var karma = process.env.NODE_PATH;
-if (karma) {
-    fontPath = Path.resolve(process.env.NODE_PATH, '../' + fontPath);
+/* Font proxy for CanvasRenderer
+ * Get font data from freetype directly instead of creating whole font json file
+ */
+var DynamicFontProxy = function (font, size) {
+    font.setSize(size);
+    this.font = font;
+    this.size = size;   // actually, size is the font pt, but we use it as px.
+    this.resolution = 72;
+    this.kerning = [];
+    this.exporter = 'dynamicFontProxy';
+    this.version = '0.0.1';
+    this.glyphs = {};
+    //['underline_thickness', 'underline_position', 'max_advance_width','height','descender',
+    // 'ascender','units_per_EM','style_name','family_name'].forEach(function (field) {
+    //    this[field] = font[field]; // not worked, operator [] can not lookup values from base type
+    //});
+    this.underline_thickness = font.underline_thickness;
+    this.underline_position = font.underline_position;
+    this.max_advance_width = font.max_advance_width;
+    this.height = font.height;
+    this.descender = font.descender;
+    this.ascender = font.ascender;
+    this.units_per_EM = font.units_per_EM;
+    this.style_name = font.style_name;
+    this.family_name = font.family_name;
+};
+
+DynamicFontProxy.prototype.requestCharacterGlyph = function (char) {
+    char = char[0];
+    var glyph = this.glyphs[char];
+    if (!glyph) {
+        this.font.loadChar(char, FontLib.FT.LOAD_NO_BITMAP/* | FontLib.FT.LOAD_NO_HINTING*/);
+        var metrics = this.font.glyph.metrics;
+        this.glyphs[char] = {
+            xoff: metrics.horiAdvance,
+            width: metrics.width,
+            height: metrics.height,
+            hbx: metrics.horiBearingX,
+            hby: metrics.horiBearingY,
+            path: DynamicFontProxy._getGlyphOutline(FontLib.FT, this.font, char),
+        };
+    }
+    return glyph;
+};
+
+DynamicFontProxy._getGlyphOutline = function(ft, face, code) {
+    // copied from https://github.com/mattdesl/fontpath/blob/master/lib/SimpleJson.js
+    if (face.glyph.format !== ft.GLYPH_FORMAT_OUTLINE) {
+        console.warn("Charcode", code, "(" + String.fromCharCode(code) + ") has no outline");
+        return [];
+    }
+    var data = [];
+    ft.Outline_Decompose(face, {
+        move_to: function (x, y) {
+            data.push(["m", x, y]);
+        },
+        line_to: function (x, y) {
+            data.push(["l", x, y]);
+        },
+        quad_to: function (cx, cy, x, y) {
+            data.push(["q", cx, cy, x, y]);
+        },
+        cubic_to: function (cx1, cy1, cx2, cy2, x, y) {
+            data.push(["c", cx1, cy1, cx2, cy2, x, y]);
+        },
+    });
+    return data;
 }
-else {
-    fontPath = Path.join(process.cwd(), fontPath);
-}
-var Font = require(fontPath);
 
 /* The font renderer
  */
@@ -19,7 +78,7 @@ var FontRenderer_path = function (style, font) {
     var forceRoundCapWidth = 1;
 
     this.renderer = new CanvasRenderer();
-    this.renderer.font = Font;
+    this.renderer.font = new DynamicFontProxy(font, style.fontSize);
     this.renderer.fontSize = style.fontSize;
     this.renderer.align = CanvasRenderer.Align.LEFT;
 
@@ -128,6 +187,7 @@ FontRenderer_path.prototype.render = function (char) {
     var renderer = this.renderer;
 
     // setup renderer
+    renderer.font.requestCharacterGlyph(char);   // actually load glyph
     renderer.text = char;
 
     // setup canvas
