@@ -1,11 +1,11 @@
-﻿var fontRenderer_paper = function (style) {
+﻿var FontRenderer_paper = function (style) {
     this.textItem = new paper.PointText(paper.Item.NO_INSERT);
     this.textItem.style = style;
     // reserve shadow's size when rasterizing
-    this.textItem.getStrokeBounds = fontRenderer_paper._fixedRenderBounds(this.textItem.getStrokeBounds, style);
+    this.textItem.getStrokeBounds = FontRenderer_paper._fixedRenderBounds(this.textItem.getStrokeBounds, style);
 };
 
-fontRenderer_paper.prototype.render = function (char) {
+FontRenderer_paper.prototype.render = function (char) {
     this.textItem.content = char;
     // check valid
     var bounds = this.textItem.bounds;
@@ -23,7 +23,7 @@ fontRenderer_paper.prototype.render = function (char) {
     }
 };
 
-fontRenderer_paper._fixedRenderBounds = function (strokeBoundsGetter, style) {
+FontRenderer_paper._fixedRenderBounds = function (strokeBoundsGetter, style) {
     var leftExpand = Math.max(style.shadowBlur - style.shadowOffset.x, 0);
     var rightExpand = Math.max(style.shadowBlur + style.shadowOffset.x, 0);
     var topExpand = Math.max(style.shadowBlur - style.shadowOffset.y, 0);

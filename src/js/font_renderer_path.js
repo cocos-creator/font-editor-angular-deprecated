@@ -1,7 +1,19 @@
 ﻿var CanvasRenderer = require('fontpath-canvas');
-var Font = require('./node_modules/fontpath-canvas/node_modules/fontpath-test-fonts/lib/Inconsolata.otf');
 
-var fontRenderer_path = function (style) {
+var Path = require('path');
+var fontPath = './node_modules/fontpath-canvas/node_modules/fontpath-test-fonts/lib/Inconsolata.otf';
+var karma = process.env.NODE_PATH;
+if (karma) {
+    fontPath = Path.resolve(process.env.NODE_PATH, '../' + fontPath);
+}
+else {
+    fontPath = Path.join(process.cwd(), fontPath);
+}
+var Font = require(fontPath);
+
+/* The font renderer
+ */
+var FontRenderer_path = function (style, font) {
     // strokeJoin如果是miter，不论miterLimit设成多少，有些字体都无法完美描边每个字符，
     // 所以这里限制只有一定宽度以下才能使用miter
     var forceRoundCapWidth = 1;
@@ -43,7 +55,7 @@ var fontRenderer_path = function (style) {
     this._caculateBounds();
 };
 
-fontRenderer_path.prototype._caculateBounds = function () {
+FontRenderer_path.prototype._caculateBounds = function () {
     var style = this.style;
     var expandLeft = Math.max(style.shadowBlur - style.shadowOffset.x, 0) + style.strokeWidth;
     var expandRight = Math.max(style.shadowBlur + style.shadowOffset.x, 0) + style.strokeWidth;
@@ -52,7 +64,8 @@ fontRenderer_path.prototype._caculateBounds = function () {
     this.expandWidth = expandLeft + expandRight;
     var expandHeight = expandTop + expandBottom;
 
-    var font = this.renderer.iterator.font;
+    var font = this.renderer.font;
+    // caculate pixel manually, because CanvasRenderer uses pt, but we use px.
     var pixelHeight = font.height / font.units_per_EM * this.renderer.fontSize;
     var pixelAscender = font.ascender / font.units_per_EM * this.renderer.fontSize;
     this.x = expandLeft;
@@ -60,7 +73,7 @@ fontRenderer_path.prototype._caculateBounds = function () {
     this.height = pixelHeight + expandHeight;
 };
 
-fontRenderer_path._applyOutlineStyle = function (ctx, style) {
+FontRenderer_path._applyOutlineStyle = function (ctx, style) {
     ctx.strokeStyle = style.strokeColor.toCanvasStyle(ctx);
     ctx.lineWidth = style.strokeWidth;
     ctx.lineJoin = style.strokeJoin;
@@ -82,13 +95,13 @@ fontRenderer_path._applyOutlineStyle = function (ctx, style) {
     }*/
 };
 
-fontRenderer_path._applyFillStyle = function (ctx, style) {
+FontRenderer_path._applyFillStyle = function (ctx, style) {
     ctx.fillColor = style.strokeColor.toCanvasStyle(ctx);
     //ctx.lineWidth = 0;
     //ctx.strokeStyle = 'rgba(0,0,0,0)';
 };
 
-fontRenderer_path._applyShadowStyle = function (ctx, style) {
+FontRenderer_path._applyShadowStyle = function (ctx, style) {
     if (style) {
         ctx.shadowOffsetX = style.shadowOffset.x;
         ctx.shadowOffsetY = style.shadowOffset.y;
@@ -101,13 +114,13 @@ fontRenderer_path._applyShadowStyle = function (ctx, style) {
         ctx.shadowBlur = 0;
         ctx.shadowColor = null;
     }
-}
+};
 
-fontRenderer_path.prototype._hasOutline = function () {
+FontRenderer_path.prototype._hasOutline = function () {
     return (!this.style.strokeColor.hasAlpha() || this.style.strokeColor.alpha > 0) && this.style.strokeWidth > 0;
 };
 
-fontRenderer_path.prototype.render = function (char) {
+FontRenderer_path.prototype.render = function (char) {
     // cached member
     var canvas = this.canvas;
     var style = this.style;
@@ -128,15 +141,15 @@ fontRenderer_path.prototype.render = function (char) {
     //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // draw text with shadow
-    fontRenderer_path._applyShadowStyle(ctx, style);
-    fontRenderer_path._applyFillStyle(ctx, style);
+    FontRenderer_path._applyShadowStyle(ctx, style);
+    FontRenderer_path._applyFillStyle(ctx, style);
     renderer.fill(ctx, this.x, this.y);
     if (this._hasOutline()) {
         // draw outline with shadow
-        fontRenderer_path._applyOutlineStyle(ctx, style);
+        FontRenderer_path._applyOutlineStyle(ctx, style);
         renderer.stroke(ctx, this.x, this.y);
         // redraw text
-        fontRenderer_path._applyShadowStyle(ctx, null);
+        FontRenderer_path._applyShadowStyle(ctx, null);
         renderer.fill(ctx, this.x, this.y);
     }
 

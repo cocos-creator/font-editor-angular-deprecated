@@ -16,7 +16,7 @@ var paths = {
         'src/js/file_utils.js',
         'src/js/convert_into_text.js',
         'src/js/font_renderer_path.js',
-        //'src/js/font_renderer_paper.js',
+        'src/js/font_renderer_paper.js',
         'src/js/fontEditor.js',
         'src/js/app.js'
     ],
@@ -30,15 +30,13 @@ var paths = {
         'ext/paper/dist/paper-core.js',
         'ext/jquery/dist/jquery.js',
         'ext/preserve-win-state.js',
-    ],
-    test: [
         'bin/js/core.dev.js',
         'bin/js/workSpace.js',
-        'bin/js/file_utils.js',
-        'bin/js/convert_into_text.js',
-        'bin/js/fontEditor.js',
+    ],
+    test: [
         'test/*.js',
-        'test/unit/*.js'
+        'test/unit/*.js',
+        '!src/js/app.js'
     ],
 };
 
@@ -82,7 +80,7 @@ gulp.task('fix-source-map', ['build'], function() {
 
 // test
 gulp.task('test', ['default'], function() {
-    var testFiles = paths.ext.concat(paths.test);
+    var testFiles = paths.ext.concat(paths.src, paths.test);
     return gulp.src(testFiles)
         .pipe(karma({
             configFile: 'karma.conf.js',

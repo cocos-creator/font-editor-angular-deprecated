@@ -20,7 +20,9 @@ var FontEditor = (function () {
                         'fillColor', 'strokeColor', 'strokeWidth', 'strokeJoin', 'miterLimit', 
                         'shadowColor', 'shadowBlur', 'shadowOffset', 
                         'dashOffset', 'dashArray'];
-
+    
+    var defaultFontRenderer = FontRenderer_path;    //('FontRenderer_path', 'FontRenderer_paper')
+    
     // ================================================================================
     // constructor
     // ================================================================================
@@ -40,6 +42,7 @@ var FontEditor = (function () {
         this._sortedCharList = null;    // sorted keys of _charTable
         this.fontTable = {names: [], paths: []};
         _updateCharTable(this);
+        this._fontRendererClass = defaultFontRenderer;
 
         // font --------------------------------
 
@@ -173,7 +176,10 @@ var FontEditor = (function () {
 
     FontEditor.prototype._recreateAtlas = function (forExport) {
         var self = this;
-        console.log('_recreateAtlas font family: ' + self.fontFamily);
+        if (!self._font) {
+            console.error('font ' + self.fontFamily + ' is not specified');
+            return;
+        }
 
         // create atlas
         console.time('create atlas');
@@ -184,11 +190,15 @@ var FontEditor = (function () {
         });
 
         self.atlas.clear();
-        var fontRenderer = new fontRenderer_path(style);
+        var fontRenderer = new this._fontRendererClass(style, self._font);
         for (var char in self._charTable) {
             var img = fontRenderer.render(char);
             if (!img) {
                 continue;   // skip invisible
+            }
+            if (!img.width || !img.height) {
+                console.error('invalid font raster: ' + char);
+                continue;
             }
             // create texture
             var tex = new FIRE.SpriteTexture(img);
@@ -295,8 +305,8 @@ var FontEditor = (function () {
         self.fontTable = data;
         var fontIndex = 16;
         if (data.names.length > fontIndex) {
-            self.fontFamily = data.names[fontIndex];
             self._font = FontLib.loadFont(data.paths[fontIndex]);
+            self.fontFamily = data.names[fontIndex];
         }
         self._paperProject.activate();
         //self._recreateAtlas(false);
@@ -409,7 +419,7 @@ var FontEditor = (function () {
                 error = getKerning(font, firstCharIndex, secondCharIndex, kerningMode, kerningVec);
                 if (!error && kerningVec.x !== 0) {
                     output.push([first, second, kerningVec.x / 64]);
-                } 
+                }
             }
         }
     };
