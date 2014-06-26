@@ -130,6 +130,13 @@ FontRenderer_path.prototype._caculateBounds = function () {
     this.x = expandLeft;
     this.y = pixelAscender + expandTop;
     this.height = pixelHeight + expandHeight;
+    /*
+    // 画布需要外扩一个像素，否则放大后边缘如果有像素做线性插值时会有锯齿，不过这会对xyoffset有影响。
+    var padding = 1;
+    this.x += padding;
+    this.y += padding;
+    this.height += (padding * 2);
+    this.expandWidth += (padding * 2);*/
 };
 
 FontRenderer_path._applyOutlineStyle = function (ctx, style) {

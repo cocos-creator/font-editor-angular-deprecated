@@ -21,7 +21,7 @@ var convertIntoText = function (data) {
         text += ' ';
         for (var j = 0; j < tagList.length; j++) {
             var tag = tagList[j];
-            console.log(tag);
+            //console.log(tag);
             var val = data[tag];
             if (j > 0) {
                 text += ' ';

@@ -116,15 +116,15 @@ var FontEditor = (function () {
     // define setter for style fields
     _styleFields.forEach(function (field) {
         var _field = '_' + field;
-        FontEditor.prototype.__defineSetter__(field, function (val) {
-            this[_field] = val;
+        FontEditor.prototype.__defineSetter__(field, function (value) {
+            this[_field] = value;
             this._recreateAtlas(false);
         });
     });
 
-    FontEditor.prototype.__defineSetter__('sampleText', function (str) {
-        this._sampleText = sampleText;
-        _updateCharTable();
+    FontEditor.prototype.__defineSetter__('sampleText', function (value) {
+        this._sampleText = value;
+        _updateCharTable(this);
     });
 
     FontEditor.prototype.__defineSetter__('displayBounds', function (value) {
@@ -204,13 +204,17 @@ var FontEditor = (function () {
             var tex = new FIRE.SpriteTexture(img);
             tex.name = char;
             self._charTable[char] = tex;
-            // get trim rect to caculate actual size including effects
-            var trimRect = FIRE.getTrimRect(img, self.atlas.trimThreshold);
-            tex.trimX = trimRect.x;
-            tex.trimY = trimRect.y;
-            tex.width = trimRect.width;
-            tex.height = trimRect.height;
 
+            var trim = true;
+            if (trim) {
+                // get trim rect to caculate actual size including effects
+                var trimRect = FIRE.getTrimRect(img, self.atlas.trimThreshold);
+                tex.trimX = trimRect.x;
+                tex.trimY = trimRect.y;
+                tex.width = trimRect.width;
+                tex.height = trimRect.height;
+            }
+            
             // if visible, pack it into atlas
             if (tex.width > 0 && tex.height > 0) {
                 self.atlas.add(tex);
