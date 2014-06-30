@@ -115,7 +115,7 @@ gulp.task('nw', function(callback) {
     var path = require('path');
     var buildingPath = path.join(__dirname, 'node_modules', 'font-lib', 'node_modules', 'freetype2');
     var nwgyp = process.platform === 'win32' ? 'nw-gyp.cmd' : 'nw-gyp';
-    childProcess.execFile(nwgyp, ['rebuild', '--target=0.9.2'], { cwd: buildingPath },
+    childProcess.execFile(nwgyp, ['rebuild', '--target=0.10.0-rc1'], { cwd: buildingPath },
         function (err, stdout, stderr) {
             if (err) {
                 console.error(err);
