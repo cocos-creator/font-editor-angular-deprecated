@@ -68,7 +68,7 @@ DynamicFontProxy._getGlyphOutline = function(ft, face, code) {
         },
     });
     return data;
-}
+};
 
 /* The font renderer
  */
