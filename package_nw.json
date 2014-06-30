@@ -22,6 +22,7 @@
     "gulp-jshint": "",
     "gulp-rename": "",
     "gulp-replace": "",
+    "gulp-stylus": "",
     "gulp-uglifyjs": "",
     "jshint-stylish": "",
     "qunitjs": "^1.14.0"

@@ -6,6 +6,7 @@ var rename = require('gulp-rename');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglifyjs');
+var stylus = require('gulp-stylus');
 var replace = require('gulp-replace');
 //var karma = require('gulp-karma');
 var Path = require('path');
@@ -19,8 +20,9 @@ var paths = {
         'src/js/fontEditor.js',
         'src/js/app.js'
     ],
+    img: 'src/img/**/*',
+    css: 'src/**/*.styl',
     //dest: 'font-editor.min.js',
-    destDir: 'bin/js',
     depends: [
         '../core/bin/core.dev.js',
     ],
@@ -46,15 +48,42 @@ gulp.task('clean', function() {
     ;
 });
 
-// copy
-gulp.task('copy', ['clean'], function() {
+// copy img
+gulp.task('cp-img', function() {
+    return gulp.src(paths.img)
+    .pipe(gulp.dest('bin/img'))
+    ;
+});
+
+// copy js
+gulp.task('cp-js', function() {
     return gulp.src(paths.depends.concat(paths.src), {write: false})
-    .pipe(gulp.dest(paths.destDir))
+    .pipe(gulp.dest('bin/js'))
+    ;
+});
+
+// copy depends
+gulp.task('cp-editor-ui', function() {
+    return gulp.src(paths.ext_editor_ui)
+    .pipe(gulp.dest('ext/fire-editor-ui'))
+    ;
+});
+
+gulp.task('copy', ['cp-js', 'cp-img', 'cp-editor-ui']);
+
+// css
+gulp.task('css', function() {
+    return gulp.src('src/css/atlas-editor.styl')
+    .pipe(stylus({
+        compress: false,
+        include: 'src'
+    }))
+    .pipe(gulp.dest('bin'))
     ;
 });
 
 // build
-gulp.task('build', ['copy'], function() {
+gulp.task('build', ['clean', 'copy', 'css'], function() {
     return gulp.src(paths.src)
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
@@ -65,16 +94,16 @@ gulp.task('build', ['copy'], function() {
         outSourceMap: true,
         basePath: 'http://any.url/',  // use relative path to locate to /src/js
     }))
-    .pipe(gulp.dest(paths.destDir))
+    .pipe(gulp.dest('bin/js'))
     ;*/
 });
 
 /*/ fix source map
 gulp.task('fix-source-map', ['build'], function() {
     // fix source map separator: https://github.com/gruntjs/grunt-contrib-uglify/issues/173
-    return gulp.src([paths.destDir + '/' + paths.dest + '.map'])
+    return gulp.src(['bin/js' + '/' + paths.dest + '.map'])
     .pipe(replace('\\\\', '/'))
-    .pipe(gulp.dest(paths.destDir));
+    .pipe(gulp.dest('bin/js'));
 });*/
 
 /*// test
@@ -98,7 +127,7 @@ gulp.task('watch', function() {
 
 // auto copy scripts from src to bin
 gulp.task('watchjs', function() {
-    gulp.watch(paths.src, ['copy']);
+    gulp.watch(paths.src, ['cp-js']);
 });
 
 //
