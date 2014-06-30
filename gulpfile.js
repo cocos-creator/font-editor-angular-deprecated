@@ -7,7 +7,7 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglifyjs');
 var replace = require('gulp-replace');
-var karma = require('gulp-karma');
+//var karma = require('gulp-karma');
 var Path = require('path');
 
 var paths = {
@@ -77,7 +77,7 @@ gulp.task('fix-source-map', ['build'], function() {
     .pipe(gulp.dest(paths.destDir));
 });*/
 
-// test
+/*// test
 gulp.task('test', ['default'], function() {
     var testFiles = paths.ext.concat(paths.src, paths.test);
     return gulp.src(testFiles)
@@ -89,7 +89,7 @@ gulp.task('test', ['default'], function() {
             // Make sure failed tests cause gulp to exit non-zero
             throw err;
         });
-});
+});*/
 
 // watch
 gulp.task('watch', function() {
@@ -103,7 +103,8 @@ gulp.task('watchjs', function() {
 
 //
 gulp.task('default', ['build'/*, 'fix-source-map'*/] );
-gulp.task('all', ['test'] );
+//gulp.task('all', ['test'] );
+gulp.task('all', ['default'] );
 
 /* compile node binary plugins for node-webkit
  *  - Before actually compiling, please meet its requirements (you'll need a proper Python engine and C/C++ compiler)
