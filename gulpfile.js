@@ -17,6 +17,7 @@ var paths = {
         'src/js/convert_into_text.js',
         'src/js/font_renderer_path.js',
         'src/js/font_renderer_paper.js',
+        'src/js/workSpace.js',
         'src/js/fontEditor.js',
         'src/js/app.js'
     ],
@@ -32,7 +33,6 @@ var paths = {
         'ext/jquery/dist/jquery.js',
         'ext/preserve-win-state.js',
         'bin/js/core.dev.js',
-        'bin/js/workSpace.js',
     ],
     test: [
         'test/*.js',
