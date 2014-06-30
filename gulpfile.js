@@ -7,7 +7,6 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglifyjs');
 var replace = require('gulp-replace');
-var concat = require('gulp-concat');
 var karma = require('gulp-karma');
 var Path = require('path');
 
