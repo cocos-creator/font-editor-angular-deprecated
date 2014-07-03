@@ -9,10 +9,17 @@ var uglify = require('gulp-uglifyjs');
 var stylus = require('gulp-stylus');
 var replace = require('gulp-replace');
 //var karma = require('gulp-karma');
-var Path = require('path');
 
 var paths = {
-    src: [
+    ext_core: [ 
+        '../core/bin/**/*.js',
+    ],
+    ext_editor_ui: [ 
+        '../editor-ui/bin/**/*',
+    ],
+    img: 'src/img/**/*',
+    js: 'src/**/*.js',
+    js_in_order: [
         'src/js/file_utils.js',
         'src/js/convert_into_text.js',
         'src/js/font_renderer_path.js',
@@ -21,19 +28,8 @@ var paths = {
         'src/js/fontEditor.js',
         'src/js/app.js'
     ],
-    img: 'src/img/**/*',
     css: 'src/**/*.styl',
-    //dest: 'font-editor.min.js',
-    depends: [
-        '../core/bin/core.dev.js',
-    ],
-    ext: [
-        'ext/angular/angular.js',
-        'ext/paper/dist/paper-core.js',
-        'ext/jquery/dist/jquery.js',
-        'ext/preserve-win-state.js',
-        'bin/js/core.dev.js',
-    ],
+    html: 'src/**/*.html',
     test: [
         'test/*.js',
         'test/unit/*.js',
@@ -49,27 +45,43 @@ gulp.task('clean', function() {
 });
 
 // copy img
+gulp.task('cp-core', function() {
+    return gulp.src(paths.ext_core)
+    .pipe(gulp.dest('ext/fire-core'))
+    ;
+});
+gulp.task('cp-editor-ui', function() {
+    return gulp.src(paths.ext_editor_ui)
+    .pipe(gulp.dest('ext/fire-editor-ui'))
+    ;
+});
 gulp.task('cp-img', function() {
     return gulp.src(paths.img)
     .pipe(gulp.dest('bin/img'))
     ;
 });
 
-// copy js
-gulp.task('cp-js', function() {
-    return gulp.src(paths.depends.concat(paths.src), {write: false})
-    .pipe(gulp.dest('bin/js'))
+// js
+gulp.task('js', function() {
+    return gulp.src(paths.js_in_order, {base: 'src'})
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+    .pipe(concat('atlas-editor.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('bin'))
     ;
 });
-
-// copy depends
-gulp.task('cp-editor-ui', function() {
-    return gulp.src(paths.ext_editor_ui)
-    .pipe(gulp.dest('ext/fire-editor-ui'))
+// js-dev
+gulp.task('js-dev', function() {
+    return gulp.src(paths.js_in_order, {base: 'src'})
+    .pipe(jshint({
+        '-W087': true,
+    }))
+    .pipe(jshint.reporter(stylish))
+    .pipe(concat('atlas-editor.js'))
+    .pipe(gulp.dest('bin'))
     ;
 });
-
-gulp.task('copy', ['cp-js', 'cp-img', 'cp-editor-ui']);
 
 // css
 gulp.task('css', function() {
@@ -82,57 +94,19 @@ gulp.task('css', function() {
     ;
 });
 
-// build
-gulp.task('build', ['clean', 'copy', 'css'], function() {
-    return gulp.src(paths.src)
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish))
-    // .pipe(jshint.reporter('fail')) // disabled
-    ;
-    /*
-    .pipe(uglify(paths.dest, {
-        outSourceMap: true,
-        basePath: 'http://any.url/',  // use relative path to locate to /src/js
-    }))
-    .pipe(gulp.dest('bin/js'))
-    ;*/
-});
-
-/*/ fix source map
-gulp.task('fix-source-map', ['build'], function() {
-    // fix source map separator: https://github.com/gruntjs/grunt-contrib-uglify/issues/173
-    return gulp.src(['bin/js' + '/' + paths.dest + '.map'])
-    .pipe(replace('\\\\', '/'))
-    .pipe(gulp.dest('bin/js'));
-});*/
-
-/*// test
-gulp.task('test', ['default'], function() {
-    var testFiles = paths.ext.concat(paths.src, paths.test);
-    return gulp.src(testFiles)
-        .pipe(karma({
-            configFile: 'karma.conf.js',
-            action: 'run',
-        }))
-        .on('error', function (err) {
-            // Make sure failed tests cause gulp to exit non-zero
-            throw err;
-        });
-});*/
 
 // watch
 gulp.task('watch', function() {
-    gulp.watch(paths.src, ['default']);
+    gulp.watch(paths.ext_core, ['cp-core']).on ( 'error', gutil.log );
+    gulp.watch(paths.ext_editor_ui, ['cp-editor-ui']).on ( 'error', gutil.log );
+    gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
+    gulp.watch(paths.js, ['js-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.css, ['css']).on ( 'error', gutil.log );
+    // gulp.watch(paths.html, ['html']).on ( 'error', gutil.log );
 });
 
-// auto copy scripts from src to bin
-gulp.task('watchjs', function() {
-    gulp.watch(paths.src, ['cp-js']);
-});
-
-//
-gulp.task('default', ['build'/*, 'fix-source-map'*/] );
-//gulp.task('all', ['test'] );
+// tasks
+gulp.task('default', ['cp-core', 'cp-editor-ui', 'cp-img', 'js', 'css' ] );
 gulp.task('all', ['default'] );
 
 /* compile node binary plugins for node-webkit

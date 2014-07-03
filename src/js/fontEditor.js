@@ -305,7 +305,7 @@ var FontEditor = (function () {
     };
 
     var _setFontTable = function (self, data) {
-        console.log(data);
+        // console.log(data);
         self.fontTable = data;
         var fontIndex = 16;
         if (data.names.length > fontIndex) {
