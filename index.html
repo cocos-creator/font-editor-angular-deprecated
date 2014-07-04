@@ -33,13 +33,18 @@
         <fire-ui-field fi-name="Font Size" fi-value="fontInfo.fontSize" fi-type="int"></fire-ui-field>                           
         <fire-ui-field fi-name="Font Weight" fi-value="fontInfo.fontWeight" fi-type="enum" fi-enum-list="fontWeightList"></fire-ui-field>                           
         <fire-ui-field fi-name="Fill Color" fi-value="fontInfo.fillColor"></fire-ui-field>                           
-        <fire-ui-field fi-name="Stroke Color" fi-value="fontInfo.strokeColor"></fire-ui-field>                           
-        <fire-ui-field fi-name="Stroke Width" fi-value="fontInfo.strokeWidth" fi-type="int"></fire-ui-field>                           
-        <fire-ui-field fi-name="Stroke Join" fi-value="fontInfo.strokeJoin"></fire-ui-field>                           
-        <fire-ui-field fi-name="Miter Limit" fi-value="fontInfo.miterLimit" fi-type="int"></fire-ui-field>                           
-        <fire-ui-field fi-name="Shadow Color" fi-value="fontInfo.shadowColor"></fire-ui-field>                           
-        <fire-ui-field fi-name="Shadow Blur" fi-value="fontInfo.shadowBlur" fi-type="int"></fire-ui-field>                           
-        <fire-ui-field fi-name="Shadow Offset" fi-value="fontInfo.shadowOffset"></fire-ui-field>                           
+        <fire-ui-section fi-title="Stroke">
+            <fire-ui-field fi-name="Stroke Color" fi-value="fontInfo.strokeColor"></fire-ui-field>                           
+            <fire-ui-field fi-name="Stroke Width" fi-value="fontInfo.strokeWidth" fi-type="int"></fire-ui-field>                           
+            <fire-ui-field fi-name="Stroke Join" fi-value="fontInfo.strokeJoin"></fire-ui-field>                           
+            <fire-ui-field fi-name="Miter Limit" fi-value="fontInfo.miterLimit" fi-type="int"></fire-ui-field>                           
+        </fire-ui-section>
+        <span class="space"></span>                                                                            
+        <fire-ui-section fi-title="Shadow">
+            <fire-ui-field fi-name="Shadow Color" fi-value="fontInfo.shadowColor"></fire-ui-field>                           
+            <fire-ui-field fi-name="Shadow Blur" fi-value="fontInfo.shadowBlur" fi-type="int"></fire-ui-field>                           
+            <fire-ui-field fi-name="Shadow Offset" fi-value="fontInfo.shadowOffset"></fire-ui-field>                           
+        </fire-ui-section>
     </fire-ui-section>
 
     <span class="space"></span>                                                                            
