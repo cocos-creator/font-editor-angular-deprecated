@@ -18,14 +18,14 @@
     },
     "devDependencies": {
         "gulp": "",
+        "gulp-util": "",
         "gulp-clean": "",
-        "gulp-filter": "",
         "gulp-jshint": "",
-        "gulp-rename": "",
-        "gulp-replace": "",
+        "gulp-concat": "",
+        "gulp-uglify": "",
         "gulp-stylus": "",
-        "gulp-uglifyjs": "",
         "jshint-stylish": "",
+        "gulp-angular-templatecache": "",
         "qunitjs": "^1.14.0"
     }
 }

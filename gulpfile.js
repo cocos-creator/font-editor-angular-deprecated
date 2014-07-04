@@ -1,13 +1,12 @@
 ﻿var gulp = require('gulp');
-var gulpfilter = require('gulp-filter');
 
+var gutil = require('gulp-util');
 var clean = require('gulp-clean');
-var rename = require('gulp-rename');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
+var concat = require('gulp-concat');
 var uglify = require('gulp-uglifyjs');
 var stylus = require('gulp-stylus');
-var replace = require('gulp-replace');
 //var karma = require('gulp-karma');
 
 var paths = {
@@ -17,6 +16,9 @@ var paths = {
     ext_editor_ui: [ 
         '../editor-ui/bin/**/*',
     ],
+    ext_third: [ 
+        'src/third/**/*',
+    ],
     img: 'src/img/**/*',
     js: 'src/**/*.js',
     js_in_order: [
@@ -24,9 +26,17 @@ var paths = {
         'src/js/convert_into_text.js',
         'src/js/font_renderer_path.js',
         'src/js/font_renderer_paper.js',
+
+        // DELME
         'src/js/workSpace.js',
         'src/js/fontEditor.js',
-        'src/js/app.js'
+        // DELME
+
+        'src/js/paperUtils.js',
+        'src/js/app.js',
+        'src/js/freeMovePaper.js',
+        'src/js/rightPanelCtrl.js',
+        'src/js/workSpaceCtrl.js',
     ],
     css: 'src/**/*.styl',
     html: 'src/**/*.html',
@@ -39,7 +49,7 @@ var paths = {
 
 // clean
 gulp.task('clean', function() {
-    return gulp.src(['bin/js/*', '!bin/js/workSpace.js'], {read: false})
+    return gulp.src('bin/**/*', {read: false})
     .pipe(clean())
     ;
 });
@@ -60,13 +70,18 @@ gulp.task('cp-img', function() {
     .pipe(gulp.dest('bin/img'))
     ;
 });
+gulp.task('cp-third', function() {
+    return gulp.src(paths.ext_third)
+    .pipe(gulp.dest('ext/'))
+    ;
+});
 
 // js
 gulp.task('js', function() {
     return gulp.src(paths.js_in_order, {base: 'src'})
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
-    .pipe(concat('atlas-editor.js'))
+    .pipe(concat('font-editor.js'))
     .pipe(uglify())
     .pipe(gulp.dest('bin'))
     ;
@@ -78,14 +93,14 @@ gulp.task('js-dev', function() {
         '-W087': true,
     }))
     .pipe(jshint.reporter(stylish))
-    .pipe(concat('atlas-editor.js'))
+    .pipe(concat('font-editor.js'))
     .pipe(gulp.dest('bin'))
     ;
 });
 
 // css
 gulp.task('css', function() {
-    return gulp.src('src/css/atlas-editor.styl')
+    return gulp.src('src/css/font-editor.styl')
     .pipe(stylus({
         compress: false,
         include: 'src'
@@ -106,7 +121,7 @@ gulp.task('watch', function() {
 });
 
 // tasks
-gulp.task('default', ['cp-core', 'cp-editor-ui', 'cp-img', 'js', 'css' ] );
+gulp.task('default', ['cp-core', 'cp-editor-ui', 'cp-img', 'cp-third', 'js', 'css' ] );
 gulp.task('all', ['default'] );
 
 /* compile node binary plugins for node-webkit

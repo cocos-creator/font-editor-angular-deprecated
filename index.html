@@ -1,42 +1,67 @@
-<html>
+<html ng-app="fontEditor">
 
 <head>
-    <title>Font Editor</title>
-    <link rel="stylesheet" href="ext/fontawesome/css/font-awesome.css">
-    <link rel="stylesheet" href="ext/fire-editor-ui/editor-ui.css">
-    <link rel="stylesheet" href="bin/atlas-editor.css">
+<title>Font Editor</title>
 
-    <script type="text/javascript" src="ext/angular/angular.js"></script>
-    <script type="text/javascript" src="ext/paper/dist/paper-core.js"></script>
-    <script type="text/javascript" src="ext/jquery/dist/jquery.js"></script>
-    <script type="text/javascript" src="ext/preserve-win-state.js"></script>
-    <!--
-        <script type="text/javascript" src="ext/flash-font-detect/swfobject.js"></script>
-        <script type="text/javascript" src="ext/flash-font-detect/font-detect.js"></script>
-        <script type="text/javascript" src="ext/flash-font-detect/getFontListInFlash.js"></script>
-    -->
+<link rel="stylesheet" href="ext/fontawesome/css/font-awesome.css">
+<link rel="stylesheet" href="ext/fire-editor-ui/editor-ui.css">
+<link rel="stylesheet" href="bin/font-editor.css">
 
-    <script type="text/javascript" src="bin/js/core.dev.js"></script>
-    <script type="text/javascript" src="bin/js/workSpace.js"></script>
-    <script type="text/javascript" src="bin/js/file_utils.js"></script>
-    <script type="text/javascript" src="bin/js/convert_into_text.js"></script>
-    <script type="text/javascript" src="bin/js/font_renderer_paper.js"></script>
-    <script type="text/javascript" src="bin/js/font_renderer_path.js"></script>
-    <script type="text/javascript" src="bin/js/fontEditor.js"></script>
-    <script type="text/javascript" src="bin/js/app.js"></script>
+<script src="ext/jquery/dist/jquery.min.js"></script>
+<script src="ext/angular/angular.min.js"></script>
+<script src="ext/paper/dist/paper-core.js"></script>
+<script src="ext/fire-core/core.dev.js"></script>
+<script src="ext/fire-editor-ui/editor-ui.js"></script>
+<script src="ext/fire-editor-ui/editor-ui-templates.js"></script>
+<script src="ext/preserve-win-state.js"></script>
+<script src="bin/font-editor.js"></script>
 </head>
 
 <body>
 
-    <div id="workspace" class="workspace">
-        <canvas id="canvas"></canvas>
-    </div>
+<div id="workspace" class="workspace">
+    <canvas id="canvas"></canvas>
+</div>
 
-    <div id="left-sidebar" class="panel left sidebar">
-    </div>
+<div id="left-sidebar" class="panel left sidebar">
+</div>
 
-    <div id="right-sidebar" class="panel right sidebar">
+<div ng-controller="rightPanelCtrl" tabIndex="1" id="right-sidebar" class="panel right sidebar">
+    <fire-ui-section fi-title="Font Info">
+        <fire-ui-field fi-name="Character Set" fi-value="fontInfo.charSet" fi-text-mode="multi"></fire-ui-field>                           
+        <fire-ui-field fi-name="Font Family" fi-value="fontInfo.fontFamily" fi-text-mode="single"></fire-ui-field>                           
+        <fire-ui-field fi-name="Font Size" fi-value="fontInfo.fontSize" fi-type="int"></fire-ui-field>                           
+        <fire-ui-field fi-name="Font Weight" fi-value="fontInfo.fontWeight" fi-type="enum" fi-enum-list="fontWeightList"></fire-ui-field>                           
+        <fire-ui-field fi-name="Fill Color" fi-value="fontInfo.fillColor"></fire-ui-field>                           
+        <fire-ui-field fi-name="Stroke Color" fi-value="fontInfo.strokeColor"></fire-ui-field>                           
+        <fire-ui-field fi-name="Stroke Width" fi-value="fontInfo.strokeWidth" fi-type="int"></fire-ui-field>                           
+        <fire-ui-field fi-name="Stroke Join" fi-value="fontInfo.strokeJoin"></fire-ui-field>                           
+        <fire-ui-field fi-name="Miter Limit" fi-value="fontInfo.miterLimit" fi-type="int"></fire-ui-field>                           
+        <fire-ui-field fi-name="Shadow Color" fi-value="fontInfo.shadowColor"></fire-ui-field>                           
+        <fire-ui-field fi-name="Shadow Blur" fi-value="fontInfo.shadowBlur" fi-type="int"></fire-ui-field>                           
+        <fire-ui-field fi-name="Shadow Offset" fi-value="fontInfo.shadowOffset"></fire-ui-field>                           
+    </fire-ui-section>
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-section fi-title="Work Space">
+        <fire-ui-field fi-name="Smooth Canvas" fi-value="editor.smoothCanvas"></fire-ui-field>                         
+        <fire-ui-field fi-name="Show Checkerboard" fi-value="editor.showCheckerboard"></fire-ui-field>                         
+        <fire-ui-field fi-name="Background" fi-value="editor.backgroundColor"></fire-ui-field>                         
+        <fire-ui-field fi-name="Element Background" fi-value="editor.elementBgColor"></fire-ui-field>                         
+        <fire-ui-field fi-name="Element Select" fi-value="editor.elementSelectColor"></fire-ui-field>                         
+    </fire-ui-section>
+
+    <span class="space"></span>                                                                            
+
+    <div class="flex-1 flex-row">
+        <div class="flex-1"></div>
+        <fire-ui-button ng-click="export()">Export Atlas</fire-ui-button> 
+        <span class="space"></span>
+        <fire-ui-button ng-click="layout()">Layout</fire-ui-button>                                                             
+        <span class="space"></span>
     </div>
+</div>
 
 </body>
 

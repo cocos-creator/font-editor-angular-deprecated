@@ -16,9 +16,8 @@ var _saveDataUrl = function (dataUrl, path) {
 
 // 暂时从atlas-editor复制过来，之后应该统一
 var _savePng = function (canvas, basename, path) {
-    var isnw = process && process.versions && process.versions['node-webkit'];
     var pngDataUrl;
-    if (isnw) {
+    if (FIRE.isnw) {
         pngDataUrl = canvas.toDataURL("image/png");
         _saveDataUrl(pngDataUrl, path);
     }
@@ -39,8 +38,7 @@ var _savePng = function (canvas, basename, path) {
 };
 
 var _saveText = function (text, filename, path) {
-    var isnw = process && process.versions && process.versions['node-webkit'];
-    if (isnw) {
+    if (FIRE.isnw) {
         var fs = require('fs');
         fs.writeFileSync(path, text, {'encoding': 'ascii'});
     }
@@ -71,9 +69,4 @@ var getSavePath = function (defaultFilename, preserveDirKey, callback) {
         callback(this.value);
     }, false);
     chooser.click();
-};
-
-var modifyExtension = function (path, newExtension) {
-    var Path = require('path');
-    return Path.join(Path.dirname(path), Path.basename(path, Path.extname(path))) + newExtension;
 };
