@@ -23,6 +23,7 @@
         "gulp-jshint": "",
         "gulp-concat": "",
         "gulp-uglify": "",
+        "gulp-uglifyjs": "",
         "gulp-stylus": "",
         "jshint-stylish": "",
         "gulp-angular-templatecache": "",
