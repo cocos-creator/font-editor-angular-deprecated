@@ -3,8 +3,13 @@ angular.module('fontEditor', ['fireUI'])
     var fontInfo = {};
     fontInfo.data = new FIRE.FontInfo();
     fontInfo.layout = function () {
-        this.data.atlas.sort();
-        this.data.atlas.layout();
+        var atlas = this.data.atlas;
+        if ( atlas.autoSize ) {
+            atlas.width = 128;
+            atlas.height = 128;
+        }
+        atlas.sort();
+        atlas.layout();
         $rootScope.$broadcast( 'repaint', true );
     };
     // TEMP
@@ -94,8 +99,13 @@ angular.module('fontEditor', ['fireUI'])
             }
         }
 
-        fontInfo.atlas.sort();
-        fontInfo.atlas.layout();
+        var atlas = fontInfo.atlas;
+        if ( atlas.autoSize ) {
+            atlas.width = 128;
+            atlas.height = 128;
+        }
+        atlas.sort();
+        atlas.layout();
     };
 
     //

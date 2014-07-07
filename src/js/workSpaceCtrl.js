@@ -38,7 +38,9 @@ angular.module('fontEditor')
         'atlas.width', 
         'atlas.height', 
     ], function ( val, old ) {
-        $scope.atlas.layout();
+        if ( $scope.atlas.autoSize === false ) {
+            $scope.atlas.layout();
+        }
 
         //
         $scope.atlasBGLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
@@ -232,52 +234,52 @@ angular.module('fontEditor')
 
     //
     $scope.import = function ( files ) {
-        var acceptedTypes = {
-            'image/png': true,
-            'image/jpeg': true,
-            'image/jpg': true,
-            'image/gif': true
-        };
-        var processing = 0;
-        var onload = function (event) {
-            var img = new Image();
-            img.classList.add('atlas-item');
-            img.onload = function () {
-                var texture = new FIRE.SpriteTexture(img);
-                texture.name = event.target.filename;
+        // var acceptedTypes = {
+        //     'image/png': true,
+        //     'image/jpeg': true,
+        //     'image/jpg': true,
+        //     'image/gif': true
+        // };
+        // var processing = 0;
+        // var onload = function (event) {
+        //     var img = new Image();
+        //     img.classList.add('atlas-item');
+        //     img.onload = function () {
+        //         var texture = new FIRE.SpriteTexture(img);
+        //         texture.name = event.target.filename;
 
-                if ($scope.atlas.trim) {
-                    var trimRect = FIRE.getTrimRect(img, $scope.atlas.trimThreshold);
-                    texture.trimX = trimRect.x;
-                    texture.trimY = trimRect.y;
-                    texture.width = trimRect.width;
-                    texture.height = trimRect.height;
-                }
+        //         if ($scope.atlas.trim) {
+        //             var trimRect = FIRE.getTrimRect(img, $scope.atlas.trimThreshold);
+        //             texture.trimX = trimRect.x;
+        //             texture.trimY = trimRect.y;
+        //             texture.width = trimRect.width;
+        //             texture.height = trimRect.height;
+        //         }
 
-                $scope.atlas.add(texture);
-                processing -= 1;
+        //         $scope.atlas.add(texture);
+        //         processing -= 1;
                 
-                // checkIfFinished
-                if ( processing === 0 ) {
-                    $scope.atlas.sort();
-                    $scope.atlas.layout();
-                    $scope.rebuildAtlas(false);
-                }
-            };
-            img.src = event.target.result;  // 这里的dataURL是原始数据，但Image填充到画布上后，透明像素的部分会变成黑色。
-        };
+        //         // checkIfFinished
+        //         if ( processing === 0 ) {
+        //             $fontInfo.layout();
+        //             $scope.$apply();
+        //             $scope.rebuildAtlas(false);
+        //         }
+        //     };
+        //     img.src = event.target.result;  // 这里的dataURL是原始数据，但Image填充到画布上后，透明像素的部分会变成黑色。
+        // };
 
-        for (var i = 0; i < files.length; ++i) {
-            file = files[i];
-            if ( acceptedTypes[file.type] === true ) {
-                processing += 1;
-                var reader = new FileReader();
-                reader.filename = file.name;
-                reader.atlas = $scope.atlas;
-                reader.onload = onload; 
-                reader.readAsDataURL(file);
-            }
-        }
+        // for (var i = 0; i < files.length; ++i) {
+        //     file = files[i];
+        //     if ( acceptedTypes[file.type] === true ) {
+        //         processing += 1;
+        //         var reader = new FileReader();
+        //         reader.filename = file.name;
+        //         reader.atlas = $scope.atlas;
+        //         reader.onload = onload; 
+        //         reader.readAsDataURL(file);
+        //     }
+        // }
     };
 
     //
