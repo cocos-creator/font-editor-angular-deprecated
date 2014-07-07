@@ -7,10 +7,14 @@ angular.module('fontEditor', ['fireUI'])
         this.data.atlas.layout();
         $rootScope.$broadcast( 'repaint', true );
     };
+    // TEMP
+    fontInfo.data.fontFamily = "Arial";
 
     return fontInfo;
 }])
-.factory ( '$editor', function () {
+.factory ( '$editor', ['$fontInfo', function ( $fontInfo ) {
+    var fontLib = require('font-lib');
+
     var editor = {};
     editor.elementBgColor = new FIRE.Color( 0, 0.28, 1, 0.5 );
     editor.elementSelectColor = new FIRE.Color(1,1,0,1);
@@ -18,9 +22,91 @@ angular.module('fontEditor', ['fireUI'])
     editor.showCheckerboard = true;
     editor.smoothCanvas = true;
 
+    // TODO:
+    // // enum fonts from system
+    // fontLib.getFontTable(function(data) {
+    //     editor.fontTable = data;
+    // }, navigator.language);
+
+    editor.fontTable = { 
+        Arial: { fullname: "Arial", path: "/Library/Fonts/Arial.ttf" }
+    };
+    editor.nativeFont = null;
+    editor.fontRenderer = null;
+    editor.charTable = {};
+
+    editor.updateNativeFont = function () {
+        editor.nativeFont = fontLib.loadFont(editor.fontTable[$fontInfo.data.fontFamily].path);  
+    };
+
+    editor.updateFontRenderer = function () {
+        editor.fontRenderer = new FontRendererPath( $fontInfo.data, editor.nativeFont );
+    };
+
+    editor.updateCharTable = function () {
+        var charTable = editor.charTable;
+        var fontInfo = $fontInfo.data;
+        var text = fontInfo.charSet;
+        for (var i = 0, len = text.length; i < len; ++i) {
+            var c = text[i];
+
+            var sprite = charTable[c];
+            if ( !sprite ) {
+                var img = editor.fontRenderer.render(c);
+                if (!img) {
+                    continue;   // skip invisible
+                }
+                if (!img.width || !img.height) {
+                    console.error('invalid font raster: ' + char);
+                    continue;
+                }
+
+                // create texture
+                sprite = new FIRE.SpriteTexture(img);
+                sprite.name = c;
+
+                var trim = true;
+                if (trim) {
+                    // get trim rect to caculate actual size including effects
+                    var trimRect = FIRE.getTrimRect(img, fontInfo.atlas.trimThreshold);
+                    sprite.trimX = trimRect.x;
+                    sprite.trimY = trimRect.y;
+                    sprite.width = trimRect.width;
+                    sprite.height = trimRect.height;
+                }
+
+                //
+                charTable[c] = sprite;
+            }
+        }
+    };
+
+    editor.updateAtlas = function () {
+        var fontInfo = $fontInfo.data;
+        fontInfo.atlas.clear();
+
+        for ( var c in editor.charTable ) {
+            var sprite = editor.charTable[c];
+
+            // if visible, pack it into atlas
+            if (sprite.width > 0 && sprite.height > 0) {
+                fontInfo.atlas.add(sprite);
+            }
+        }
+
+        fontInfo.atlas.sort();
+        fontInfo.atlas.layout();
+    };
+
+    //
+    editor.updateNativeFont();
+    editor.updateFontRenderer();
+    editor.updateCharTable();
+    editor.updateAtlas();
+
     return editor;
-})
-.run( ['$fontInfo', function($fontInfo) {
+}])
+.run( ['$fontInfo', '$editor', function($fontInfo,$editor) {
     console.log('starting font-editor');
 
     if ( FIRE.isnw ) {
@@ -41,47 +127,5 @@ angular.module('fontEditor', ['fireUI'])
             }
         });
     }
-
-    // // canvasEL events
-    // var canvasEL = document.getElementById('canvas');
-    // canvasEL.width = canvasEL.parentNode.clientWidth;
-    // canvasEL.height = canvasEL.parentNode.clientHeight;
-    // //
-    // app.fontEditor = new FontEditor(canvasEL);
-    // window.addEventListener('resize', function() {
-    //     canvasEL.width = canvasEL.parentNode.clientWidth;
-    //     canvasEL.height = canvasEL.parentNode.clientHeight;
-    //     app.fontEditor.updateWindowSize();
-    // }, false);
-
-    // // dev tools
-    // var win = nwgui.Window.get();
-    // win.on("devtools-opened", function(url) {
-    //     console.log("devtools-opened: " + url);
-    //     app.fontEditor.displayBounds = true;
-    // });
-    // win.on("devtools-closed", function(url) {
-    //     console.log("devtools-closed: " + url);
-    //     app.fontEditor.displayBounds = false;
-    // });
-    // app.fontEditor._displayBounds = win.isDevToolsOpen();
-
-    // //
-    // angular.bootstrap(document, ['app-font-editor']);
-
-    // app.testExport = function () {
-    //     getSavePath(app.fontEditor.fontFamily + '.txt', 'exportBmFont', function (txtPath) {
-    //         var pngPath = FIRE.setExtension(txtPath, '.png');
-    //         var Path = require('path');
-    //         var basename = Path.basename(txtPath, Path.extname(txtPath));
-
-    //         var canvas = app.fontEditor.paintNewCanvas();
-    //         _savePng(canvas, basename, pngPath);
-    //         var txt = app.fontEditor.exportBmFontTxt(Path.basename(pngPath));
-    //         _saveText(txt, basename + Path.extname(txtPath), txtPath);
-
-    //         nwgui.Shell.showItemInFolder(pngPath);
-    //     });
-    // };
 }])
 ;

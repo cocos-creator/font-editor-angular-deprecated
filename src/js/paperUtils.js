@@ -26,6 +26,10 @@ var PaperUtils;
         return new paper.Color(color.r, color.g, color.b, color.a);
     };
 
+    PaperUtils.point = function (vec2) {
+        return new paper.Point( vec2.x, vec2.y );
+    };
+
     // check if rect contains, 1 is a contains b, -1 is b contains a, 0 is no contains 
     PaperUtils.rectRectContains = function (a,b) {
         if ( a.left <= b.left &&

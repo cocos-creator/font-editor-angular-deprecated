@@ -1,5 +1,5 @@
 angular.module('fontEditor')
-.controller( "workSpaceCtrl", ["$scope", "$element", "$atlas", "$editor", function ($scope, $element, $atlas, $editor) {
+.controller( "workSpaceCtrl", ["$scope", "$element", "$fontInfo", "$editor", function ($scope, $element, $fontInfo, $editor) {
     //
     function createCheckerboard ( width, height ) {
         var tmpLayer = PaperUtils.createLayer();
@@ -29,7 +29,8 @@ angular.module('fontEditor')
         return raster;
     }
 
-    $scope.atlas = $atlas.data;
+    $scope.fontInfo = $fontInfo.data;
+    $scope.atlas = $fontInfo.data.atlas;
     $scope.editor = $editor;
     $scope.curZoom = 1.0;
 
@@ -64,18 +65,18 @@ angular.module('fontEditor')
         $scope.$broadcast( 'repaint', true );
     }); 
 
-    $scope.$watchGroup ( [
-        'atlas.customPadding',
-        'atlas.algorithm',
-        'atlas.sortBy',
-        'atlas.sortOrder',
-        'atlas.allowRotate',
-    ], function ( val, old ) {
-        $scope.atlas.sort();
-        $scope.atlas.layout();
-        $scope.paint();
-        $scope.project.view.update();
-    }); 
+    // $scope.$watchGroup ( [
+    //     'atlas.customPadding',
+    //     'atlas.algorithm',
+    //     'atlas.sortBy',
+    //     'atlas.sortOrder',
+    //     'atlas.allowRotate',
+    // ], function ( val, old ) {
+    //     $scope.atlas.sort();
+    //     $scope.atlas.layout();
+    //     $scope.paint();
+    //     $scope.project.view.update();
+    // }); 
 
     $scope.$watchGroup ( [
         'editor.elementBgColor.r',
@@ -154,6 +155,9 @@ angular.module('fontEditor')
             $scope.background.fillColor = new paper.Color( 0,0,0,0 );
             $scope.background.insertAbove($scope.checkerboard);
         }
+
+        //
+        $scope.rebuildAtlas(false);
     });
 
     $scope.$on( 'paint', function ( event ) { 
@@ -360,6 +364,7 @@ angular.module('fontEditor')
                     outlineBounds.height*$scope.curZoom
                 ];
                 outline.strokeColor = PaperUtils.color($scope.editor.elementSelectColor);
+                outline.dashArray = [5,3];
             }
         }
     };

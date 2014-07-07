@@ -22,10 +22,10 @@ var paths = {
     img: 'src/img/**/*',
     js: 'src/**/*.js',
     js_in_order: [
-        'src/js/file_utils.js',
-        'src/js/convert_into_text.js',
-        'src/js/font_renderer_path.js',
-        'src/js/font_renderer_paper.js',
+        'src/js/fileUtils.js',
+        'src/js/convertIntoText.js',
+        'src/js/fontRendererPath.js',
+        'src/js/fontRendererPaper.js',
 
         // DELME
         'src/js/workSpace.js',

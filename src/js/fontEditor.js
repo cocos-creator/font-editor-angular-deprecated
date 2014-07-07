@@ -21,7 +21,7 @@ var FontEditor = (function () {
                         'shadowColor', 'shadowBlur', 'shadowOffset', 
                         'dashOffset', 'dashArray'];
     
-    var defaultFontRenderer = FontRenderer_path;    //('FontRenderer_path', 'FontRenderer_paper')
+    var _fontRendererCls = FontRendererPath;    //('FontRendererPath', 'FontRenderer_paper')
     
     // ================================================================================
     // constructor
@@ -42,7 +42,6 @@ var FontEditor = (function () {
         this._sortedCharList = null;    // sorted keys of _charTable
         this.fontTable = {names: [], paths: []};
         _updateCharTable(this);
-        this._fontRendererClass = defaultFontRenderer;
 
         // font --------------------------------
 
@@ -190,7 +189,7 @@ var FontEditor = (function () {
         });
 
         self.atlas.clear();
-        var fontRenderer = new this._fontRendererClass(style, self._font);
+        var fontRenderer = new _fontRendererCls(style, self._font);
         for (var char in self._charTable) {
             var img = fontRenderer.render(char);
             if (!img) {
