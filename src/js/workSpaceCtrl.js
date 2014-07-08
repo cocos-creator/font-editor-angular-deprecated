@@ -51,6 +51,20 @@ angular.module('fontEditor')
         'fontInfo.fillColor.g',
         'fontInfo.fillColor.b',
         'fontInfo.fillColor.a',
+        'fontInfo.strokeColor.r',
+        'fontInfo.strokeColor.g',
+        'fontInfo.strokeColor.b',
+        'fontInfo.strokeColor.a',
+        'fontInfo.strokeWidth',
+        'fontInfo.strokeJoin',
+        'fontInfo.miterLimit',
+        'fontInfo.shadowColor.r',
+        'fontInfo.shadowColor.g',
+        'fontInfo.shadowColor.b',
+        'fontInfo.shadowColor.a',
+        'fontInfo.shadowBlur',
+        'fontInfo.shadowOffset.x',
+        'fontInfo.shadowOffset.y',
     ], function ( val, old ) {
         $editor.updateFontRenderer();
         $editor.updateCharTable();
