@@ -49,7 +49,7 @@ angular.module('fontEditor', ['fireUI'])
     };
 
     editor.updateCharTable = function () {
-        var charTable = editor.charTable;
+        var charTable = {};
         var fontInfo = $fontInfo.data;
         var text = fontInfo.charSet;
         for (var i = 0, len = text.length; i < len; ++i) {
@@ -84,6 +84,7 @@ angular.module('fontEditor', ['fireUI'])
                 charTable[c] = sprite;
             }
         }
+        editor.charTable = charTable;
     };
 
     editor.updateAtlas = function () {
@@ -98,7 +99,10 @@ angular.module('fontEditor', ['fireUI'])
                 fontInfo.atlas.add(sprite);
             }
         }
+    };
 
+    editor.layoutAtlas = function () {
+        var fontInfo = $fontInfo.data;
         var atlas = fontInfo.atlas;
         if ( atlas.autoSize ) {
             atlas.width = 128;
@@ -113,6 +117,7 @@ angular.module('fontEditor', ['fireUI'])
     editor.updateFontRenderer();
     editor.updateCharTable();
     editor.updateAtlas();
+    editor.layoutAtlas();
 
     return editor;
 }])
@@ -130,10 +135,17 @@ angular.module('fontEditor', ['fireUI'])
         }
 
         $(document).keydown(function (e) { 
-            // F12
-            if ( e.keyCode == 123 ) {
+            switch ( e.keyCode ) {
+                // F12
+            case 123:
                 nativeWin.showDevTools(); 
                 e.stopPropagation();
+                break;
+
+                // F5
+            case 116:
+                nativeWin.reload();
+                break;
             }
         });
     }

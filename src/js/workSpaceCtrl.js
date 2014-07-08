@@ -35,6 +35,43 @@ angular.module('fontEditor')
     $scope.curZoom = 1.0;
 
     $scope.$watchGroup ( [
+        'fontInfo.fontFamily',
+        'fontInfo.fontWeight',
+    ], function ( val, old ) {
+        $editor.updateNativeFont();
+        $editor.updateFontRenderer();
+        $editor.updateCharTable();
+        $editor.updateAtlas();
+        $editor.layoutAtlas();
+        $scope.rebuildAtlas(false);
+    });
+
+    $scope.$watchGroup ( [
+        'fontInfo.fillColor.r',
+        'fontInfo.fillColor.g',
+        'fontInfo.fillColor.b',
+        'fontInfo.fillColor.a',
+    ], function ( val, old ) {
+        $editor.updateFontRenderer();
+        $editor.updateCharTable();
+        $editor.updateAtlas();
+        $editor.layoutAtlas();
+        $scope.rebuildAtlas(false);
+    });
+
+    $scope.$watchGroup ( [
+        'fontInfo.fontSize',
+        'fontInfo.charSet',
+        'fontInfo.fontWeight',
+    ], function ( val, old ) {
+        $editor.updateFontRenderer();
+        $editor.updateCharTable();
+        $editor.updateAtlas();
+        $editor.layoutAtlas();
+        $scope.rebuildAtlas(false);
+    }); 
+
+    $scope.$watchGroup ( [
         'atlas.width', 
         'atlas.height', 
     ], function ( val, old ) {
@@ -67,18 +104,15 @@ angular.module('fontEditor')
         $scope.$broadcast( 'repaint', true );
     }); 
 
-    // $scope.$watchGroup ( [
-    //     'atlas.customPadding',
-    //     'atlas.algorithm',
-    //     'atlas.sortBy',
-    //     'atlas.sortOrder',
-    //     'atlas.allowRotate',
-    // ], function ( val, old ) {
-    //     $scope.atlas.sort();
-    //     $scope.atlas.layout();
-    //     $scope.paint();
-    //     $scope.project.view.update();
-    // }); 
+    $scope.$watchGroup ( [
+        'atlas.customPadding',
+        'atlas.algorithm',
+        'atlas.sortBy',
+        'atlas.sortOrder',
+        'atlas.allowRotate',
+    ], function ( val, old ) {
+        $fontInfo.layout();
+    }); 
 
     $scope.$watchGroup ( [
         'editor.elementBgColor.r',
