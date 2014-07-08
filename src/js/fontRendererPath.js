@@ -83,9 +83,6 @@
         this.nativeRenderer.font = new DynamicFontProxy(nativeFont, fontInfo.fontSize);
         this.nativeRenderer.fontSize = fontInfo.fontSize;
         this.nativeRenderer.align = CanvasRenderer.Align.LEFT;
-
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
         this.fontInfo = fontInfo;
         
         // workaround incorrect miter stroke
@@ -182,10 +179,10 @@
     };
 
     FontRendererPath.prototype.render = function (char) {
-        // cached member
-        var canvas = this.canvas;
+        // new canvas for draw
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
         var style = this.style;
-        var ctx = this.ctx;
         var nativeRenderer = this.nativeRenderer;
 
         // setup renderer
@@ -216,11 +213,11 @@
             nativeRenderer.fill(ctx, this.x, this.y);
         }
 
+        // NOTE: canvas is faster than image since we skip one time png convert
         // create image
-        var img = document.createElement('img');
-        img.src = canvas.toDataURL('image/png');
-        //console.log('char: ' + char + ' w: ' + img.width + ' h: ' + img.height/* + ' s: ' + img.src*/);
-        return img;
+        // var img = document.createElement('img');
+        // img.src = canvas.toDataURL('image/png');
+        return canvas;
     };
 
     return FontRendererPath;

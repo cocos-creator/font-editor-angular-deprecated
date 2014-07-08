@@ -52,6 +52,8 @@ angular.module('fontEditor', ['fireUI'])
         var charTable = {};
         var fontInfo = $fontInfo.data;
         var text = fontInfo.charSet;
+
+        // console.time("render");
         for (var i = 0, len = text.length; i < len; ++i) {
             var c = text[i];
 
@@ -84,6 +86,7 @@ angular.module('fontEditor', ['fireUI'])
                 charTable[c] = sprite;
             }
         }
+        // console.timeEnd("render");
         editor.charTable = charTable;
     };
 
