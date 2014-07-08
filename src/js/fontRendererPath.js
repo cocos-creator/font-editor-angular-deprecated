@@ -112,7 +112,7 @@
     }
 
     var _applyFillStyle = function (ctx, renderer) {
-        ctx.fillColor = renderer.fillColor.toCanvasStyle(ctx);
+        ctx.fillStyle = renderer.fillColor.toCanvasStyle(ctx);
         //ctx.lineWidth = 0;
         //ctx.strokeStyle = 'rgba(0,0,0,0)';
     };
