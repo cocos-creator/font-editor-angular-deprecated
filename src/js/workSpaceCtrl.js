@@ -337,7 +337,6 @@ angular.module('fontEditor')
             $scope.atlasLayer.activate();
         }
 
-        var i = 0, j = 0, len = 0;
         for (i = 0; i < $scope.atlas.textures.length; ++i) {
             var tex = $scope.atlas.textures[i];
             var raster = PaperUtils.createSpriteRaster(tex);

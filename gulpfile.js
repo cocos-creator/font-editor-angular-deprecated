@@ -27,11 +27,6 @@ var paths = {
         'src/js/fontRendererPath.js',
         'src/js/fontRendererPaper.js',
 
-        // DELME
-        'src/js/workSpace.js',
-        'src/js/fontEditor.js',
-        // DELME
-
         'src/js/paperUtils.js',
         'src/js/app.js',
         'src/js/freeMovePaper.js',
