@@ -22,7 +22,6 @@ var paths = {
     img: 'src/img/**/*',
     js: 'src/**/*.js',
     js_in_order: [
-        'src/js/fileUtils.js',
         'src/js/convertIntoText.js',
         'src/js/fontRendererPath.js',
         'src/js/fontRendererPaper.js',
