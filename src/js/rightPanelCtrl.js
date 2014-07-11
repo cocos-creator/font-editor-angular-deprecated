@@ -171,18 +171,18 @@ angular.module('fontEditor')
     };
 
     $scope.export = function () {
-        var nwgui = require('nw.gui');
-
-        getSavePath($scope.fontInfo.fontFamily + '.txt', 'exportBmFont', function (txtPath) {
+        FIRE.getSavePath($scope.fontInfo.fontFamily + '.txt', 'Key_ExportBmFont', function (txtPath) {
             var pngPath = FIRE.setExtension(txtPath, '.png');
             var Path = require('path');
             var basename = Path.basename(txtPath, Path.extname(txtPath));
 
-            var canvas = _paintNewCanvas($scope.fontInfo.atlas);
-            _savePng(canvas, basename, pngPath);
             var txt = _exportBmFontTxt(Path.basename(pngPath), $scope.fontInfo, $scope.editor.charTable);
-            _saveText(txt, basename + Path.extname(txtPath), txtPath);
+            var canvas = _paintNewCanvas($scope.fontInfo.atlas);
 
+            FIRE.saveText(txt, basename + Path.extname(txtPath), txtPath);
+            FIRE.savePng(canvas, basename, pngPath, null);
+            
+            var nwgui = require('nw.gui');
             nwgui.Shell.showItemInFolder(pngPath);
         });
     };
