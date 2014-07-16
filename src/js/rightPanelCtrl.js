@@ -172,7 +172,7 @@ angular.module('fontEditor')
 
     $scope.export = function () {
         FIRE.getSavePath($scope.fontInfo.fontFamily + '.txt', 'Key_ExportBmFont', function (txtPath) {
-            var pngPath = FIRE.setExtension(txtPath, '.png');
+            var pngPath = FIRE.Path.setExtension(txtPath, '.png');
             var Path = require('path');
             var basename = Path.basename(txtPath, Path.extname(txtPath));
 
@@ -180,7 +180,7 @@ angular.module('fontEditor')
             var canvas = _paintNewCanvas($scope.fontInfo.atlas);
 
             FIRE.saveText(txt, basename + Path.extname(txtPath), txtPath);
-            FIRE.savePng(canvas, basename, pngPath, null);
+            FIRE.savePng(canvas, basename + '.png', pngPath, null);
             
             var nwgui = require('nw.gui');
             nwgui.Shell.showItemInFolder(pngPath);
